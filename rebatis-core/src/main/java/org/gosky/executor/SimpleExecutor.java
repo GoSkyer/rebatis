@@ -1,6 +1,5 @@
 package org.gosky.executor;
 
-
 import com.github.jasync.sql.db.Configuration;
 import com.github.jasync.sql.db.Connection;
 import com.github.jasync.sql.db.QueryResult;
@@ -43,3 +42,4 @@ public class SimpleExecutor implements Executor {
         return queryResultCompletableFuture;
     }
 }
+
