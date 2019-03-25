@@ -1,7 +1,8 @@
 package org.gosky;
 
-import org.gosky.rebatis.executor.Executor;
-import org.gosky.rebatis.executor.SimpleExecutor;
+
+import org.gosky.executor.Executor;
+import org.gosky.executor.SimpleExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

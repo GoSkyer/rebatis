@@ -3,11 +3,14 @@ package org.gosky.executor;
 import com.github.jasync.sql.db.Configuration;
 import com.github.jasync.sql.db.Connection;
 import com.github.jasync.sql.db.QueryResult;
+import com.github.jasync.sql.db.general.ArrayRowData;
 import com.github.jasync.sql.db.mysql.pool.MySQLConnectionFactory;
 import com.github.jasync.sql.db.pool.ConnectionPool;
 import com.github.jasync.sql.db.pool.PoolConfiguration;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,13 +36,26 @@ public class SimpleExecutor implements Executor {
                 new MySQLConnectionFactory(new Configuration(
                         "root",
                         "localhost",
-                        3306,
+                        3307,
                         "123456",
                         "test"
                 )), poolConfiguration);
+        try {
+            connection.connect().get();
+            return connection.sendPreparedStatement("select * from obn_virtual limit 2");
+        } catch (
+                InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-        CompletableFuture<QueryResult> queryResultCompletableFuture = connection.sendPreparedStatement(sql);
-        return queryResultCompletableFuture;
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        Executor executor = new SimpleExecutor();
+        CompletableFuture<QueryResult> query = executor.query("", "");
+        QueryResult queryResult = query.get();
+        System.out.println(Arrays.toString(((ArrayRowData) (queryResult.getRows().get(0))).getColumns()));
+        System.out.println(Arrays.toString(((ArrayRowData) (queryResult.getRows().get(1))).getColumns()));
     }
 }
 
