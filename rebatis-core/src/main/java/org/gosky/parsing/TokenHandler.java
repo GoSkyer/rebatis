@@ -1,5 +1,5 @@
 /*
- *    Copyright 2009-2014 the original author or authors.
+ *    Copyright 2009-2012 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,29 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.gosky.session;
-
-import java.io.IOException;
-import java.sql.Connection;
+package org.gosky.parsing;
 
 /**
- * 默认SqlSession实现
- *
+ * @author Clinton Begin
  */
-public class DefaultSqlSession implements SqlSession {
-
-  /**
-   * 是否自动提交
-   */
-  private boolean autoCommit;
-
-  @Override
-  public Connection getConnection() {
-    return null;
-  }
-
-  @Override
-  public void close() throws IOException {
-
-  }
+/**
+ * 记号处理器
+ * 
+ */
+public interface TokenHandler {
+	//处理记号
+  String handleToken(String content);
 }
+

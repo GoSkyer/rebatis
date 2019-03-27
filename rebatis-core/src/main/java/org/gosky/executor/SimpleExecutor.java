@@ -21,32 +21,32 @@ import java.util.concurrent.TimeUnit;
 public class SimpleExecutor implements Executor {
     @Override
     public CompletableFuture<QueryResult> query(String sql, Object parameter) {
-
-        PoolConfiguration poolConfiguration = new PoolConfiguration(
-                // maxObjects
-                100,
-                // maxIdle
-                TimeUnit.MINUTES.toMillis(15),
-                // maxQueueSize
-                10_000,
-                // validationInterval
-                TimeUnit.SECONDS.toMillis(30)
-        );
-        Connection connection = new ConnectionPool<>(
-                new MySQLConnectionFactory(new Configuration(
-                        "root",
-                        "localhost",
-                        3307,
-                        "123456",
-                        "test"
-                )), poolConfiguration);
-        try {
-            connection.connect().get();
-            return connection.sendPreparedStatement("select * from obn_virtual limit 2");
-        } catch (
-                InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+//
+//        PoolConfiguration poolConfiguration = new PoolConfiguration(
+//                // maxObjects
+//                100,
+//                // maxIdle
+//                TimeUnit.MINUTES.toMillis(15),
+//                // maxQueueSize
+//                10_000,
+//                // validationInterval
+//                TimeUnit.SECONDS.toMillis(30)
+//        );
+//        Connection connection = new ConnectionPool<>(
+//                new MySQLConnectionFactory(new Configuration(
+//                        "root",
+//                        "localhost",
+//                        3307,
+//                        "123456",
+//                        "test"
+//                )), poolConfiguration);
+//        try {
+//            connection.connect().get();
+//            return connection.sendPreparedStatement("select * from obn_virtual limit 2");
+//        } catch (
+//                InterruptedException | ExecutionException e) {
+//            e.printStackTrace();
+//        }
         return null;
     }
 
