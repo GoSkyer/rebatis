@@ -218,12 +218,12 @@ public class ResolverUtil<T> {
      * Each class is offered up to the Test as it is discovered, and if the Test returns
      * true the class is retained.  Accumulated classes can be fetched by calling
      * {@link #getClasses()}.
+     * 主要的方法，找一个package下满足条件的所有类,被TypeHanderRegistry,MapperRegistry,TypeAliasRegistry调用
      *
      * @param test        an instance of {@link Test} that will be used to filter classes
      * @param packageName the name of the package from which to start scanning for
      *                    classes, e.g. {@code net.sourceforge.stripes}
      */
-    //主要的方法，找一个package下满足条件的所有类,被TypeHanderRegistry,MapperRegistry,TypeAliasRegistry调用
     public ResolverUtil<T> find(Test test, String packageName) {
         String path = getPackagePath(packageName);
 

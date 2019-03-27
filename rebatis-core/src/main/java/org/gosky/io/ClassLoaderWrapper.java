@@ -17,6 +17,9 @@ package org.gosky.io;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * A class to wrap access to multiple class loaders making them work as one
@@ -171,6 +174,7 @@ public class ClassLoaderWrapper {
      * @throws ClassNotFoundException - Remember the wisdom of Judge Smails: Well, the world needs ditch diggers, too.
      */
     Class<?> classForName(String name, ClassLoader[] classLoader) throws ClassNotFoundException {
+
         for (ClassLoader cl : classLoader) {
             if (null != cl) {
                 try {
