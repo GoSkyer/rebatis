@@ -33,6 +33,7 @@ public class GenericTokenParserTest {
             this.variables = variables;
         }
 
+        @Override
         public String handleToken(String content) {
             return variables.get(content);
         }
