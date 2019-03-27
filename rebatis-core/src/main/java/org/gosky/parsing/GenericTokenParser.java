@@ -24,7 +24,9 @@ package org.gosky.parsing;
  */
 public class GenericTokenParser {
 
-    //有一个开始和结束记号
+    /**
+     * 有一个开始和结束记号
+     */
     private final String openToken;
     private final String closeToken;
     /**

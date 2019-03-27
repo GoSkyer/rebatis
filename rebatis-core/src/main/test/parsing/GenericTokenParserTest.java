@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 public class GenericTokenParserTest {
 
     public static class VariableTokenHandler implements TokenHandler {
-        private Map<String, String> variables = new HashMap<String, String>();
+        private Map<String, String> variables;
 
         public VariableTokenHandler(Map<String, String> variables) {
             this.variables = variables;
