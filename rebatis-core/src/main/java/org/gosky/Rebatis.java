@@ -1,5 +1,7 @@
 package org.gosky;
 
+import com.github.jasync.sql.db.pool.ConnectionPool;
+
 import org.gosky.executor.Executor;
 import org.gosky.executor.SimpleExecutor;
 
@@ -16,8 +18,11 @@ import java.lang.reflect.Proxy;
 public class Rebatis {
 
     //    private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
-    private final Executor executor = new SimpleExecutor();
+    private final Executor executor;
 
+    Rebatis(Executor executor) {
+        this.executor = executor;
+    }
 
     @SuppressWarnings("unchecked") // Single-interface proxy creation guarded by parameter safety.
     public <T> T create(final Class<T> mapper) {
@@ -56,4 +61,17 @@ public class Rebatis {
 //        }
 //        return result;
 //    }
+
+
+    public static final class Builder {
+        private final ConnectionPool connectionPool;
+
+        public Builder(ConnectionPool connectionPool) {
+            this.connectionPool = connectionPool;
+        }
+
+        public Rebatis build() {
+            return new Rebatis(new SimpleExecutor(connectionPool));
+        }
+    }
 }

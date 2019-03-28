@@ -10,6 +10,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>rebatis-core</module>
+        <module>rebase-samples</module>
     </modules>
 
 
