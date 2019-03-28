@@ -10,11 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rebatis-core</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
-    <name>rebatis-core Maven Webapp</name>
-    <!-- FIXME change it to the project's website -->
-    <url>http://www.example.com</url>
+    <name>rebatis-core</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,4 +1,4 @@
-package org.gosky;
+package org.gosky.rebatis.sample;
 
 
 import com.github.jasync.sql.db.ConnectionPoolConfigurationBuilder;
@@ -49,7 +49,7 @@ public class Main {
         Executor executor = new SimpleExecutor(connectionPool);
         CompletableFuture<QueryResult> query = executor.query("select * from user", null);
         query.thenAccept(queryResult -> {
-            System.out.println("queryResult: " + queryResult.toString());
+            System.out.println("queryResult : " + queryResult.toString());
         });
 
         while (true) {
