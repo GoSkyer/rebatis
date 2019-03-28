@@ -12,7 +12,7 @@
     <artifactId>rebatis-core</artifactId>
     <packaging>jar</packaging>
 
-    <name>rebatis-core</name>
+    <type>rebatis-core</type>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

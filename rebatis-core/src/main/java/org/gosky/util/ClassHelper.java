@@ -20,8 +20,8 @@ public final class ClassHelper {
     private static Set<Class<?>> CLASS_SET;
 
     static {
-        String basePackage = ConfigHelper.getAppBasePackage();
-        CLASS_SET = ClassUtil.getClassSet(basePackage);
+//        String basePackage = ConfigHelper.getAppBasePackage();
+        CLASS_SET = ClassUtil.getClassSet("org.gosky.mapping");
     }
 
     /**
