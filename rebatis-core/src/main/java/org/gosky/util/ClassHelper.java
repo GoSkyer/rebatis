@@ -6,6 +6,7 @@ import org.gosky.annotations.Mapper;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by zzqno on 2017-3-21.
@@ -16,15 +17,15 @@ public final class ClassHelper {
     /**
      * 定义集合类（用于存放加载的类）
      */
-    private static Set<Class<?>> CLASS_SET = null;
+    private static Set<Class<?>> CLASS_SET;
 
     static {
-        String basePackename = ConfigHelper.getAppBasePackage();
-        CLASS_SET = ClassUtil.getClassSet(basePackename);
+        String basePackage = ConfigHelper.getAppBasePackage();
+        CLASS_SET = ClassUtil.getClassSet(basePackage);
     }
 
     /**
-     * 获取应用名包下的所有类
+     * 获取包下的所有类
      *
      * @return
      */
@@ -33,18 +34,12 @@ public final class ClassHelper {
     }
 
     /**
-     * 获取应用包下所有service类
+     * 获取应用包下所有带有mapper注解的接口
      *
      * @return
      */
-    public static Set<Class<?>> getMapperClassSet() {
-        Set<Class<?>> classSet = new HashSet<>();
-        for (Class<?> cls : CLASS_SET) {
-            if (cls.isAnnotationPresent(Mapper.class)) {
-                classSet.add(cls);
-            }
-        }
-        return classSet;
+    public static Set<Class<?>> getMapperInterfaceSet() {
+        return CLASS_SET.stream().filter(cls -> cls.isAnnotationPresent(Mapper.class) && cls.isInterface()).collect(Collectors.toSet());
     }
 
 
@@ -55,23 +50,7 @@ public final class ClassHelper {
      * @return
      */
     public static Set<Class<?>> getClassSetByAnnotation(Class<? extends Annotation> annotationClass) {
-        Set<Class<?>> classSet = new HashSet<>();
-        for (Class<?> cls : CLASS_SET) {
-            if (cls.isAnnotationPresent(annotationClass)) {
-                classSet.add(cls);
-            }
-        }
-        return classSet;
-    }
-
-    /**
-     * 获取所有class
-     *
-     * @return
-     */
-    public static Set<Class<?>> getBeanClassSet() {
-        Set<Class<?>> classSet = new HashSet<>();
-        return classSet;
+        return CLASS_SET.stream().filter(cls -> cls.isAnnotationPresent(annotationClass)).collect(Collectors.toSet());
     }
 
     /**
@@ -81,13 +60,7 @@ public final class ClassHelper {
      * @return
      */
     public static Set<Class<?>> getClassSetBySuper(Class<?> superClass) {
-        Set<Class<?>> classSet = new HashSet<>();
-        for (Class<?> cls : classSet) {
-            if (superClass.isAssignableFrom(cls) && !superClass.equals(cls)) {
-                classSet.add(cls);
-            }
-        }
-        return classSet;
+        return CLASS_SET.stream().filter(cls -> superClass.isAssignableFrom(cls) && !superClass.equals(cls)).collect(Collectors.toSet());
     }
 
 }
