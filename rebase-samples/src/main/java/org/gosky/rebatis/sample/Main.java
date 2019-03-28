@@ -1,18 +1,16 @@
-package org.gosky;
+package org.gosky.rebatis.sample;
 
 
 import com.github.jasync.sql.db.ConnectionPoolConfigurationBuilder;
-import com.github.jasync.sql.db.QueryResult;
 import com.github.jasync.sql.db.mysql.MySQLConnection;
 import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder;
 import com.github.jasync.sql.db.pool.ConnectionPool;
 
-import org.gosky.executor.Executor;
-import org.gosky.executor.SimpleExecutor;
+import org.gosky.Rebatis;
+import org.gosky.rebatis.sample.mapper.TestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import kotlin.Unit;
@@ -45,12 +43,11 @@ public class Main {
             }
         });
 
-
-        Executor executor = new SimpleExecutor(connectionPool);
-        CompletableFuture<QueryResult> query = executor.query("select * from user", null);
-        query.thenAccept(queryResult -> {
-            System.out.println("queryResult: " + queryResult.toString());
-        });
+        Rebatis rebatis = new Rebatis.Builder(connectionPool).build();
+        rebatis.create(TestMapper.class).test("select * from user")
+                .thenAccept(queryResult -> {
+                    System.out.println("queryResult : " + queryResult.toString());
+                });
 
         while (true) {
 

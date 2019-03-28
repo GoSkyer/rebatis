@@ -10,11 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rebatis-core</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
-    <name>rebatis-core Maven Webapp</name>
-    <!-- FIXME change it to the project's website -->
-    <url>http://www.example.com</url>
+    <name>rebatis-core</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -48,19 +46,6 @@
             <version>1.18.6</version>
             <scope>provided</scope>
         </dependency>
-
-
-        <!--<dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.25</version>
-        </dependency>-->
 
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
