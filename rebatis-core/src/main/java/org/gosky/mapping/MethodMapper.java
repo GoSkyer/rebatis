@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.gosky.common.SQLType;
 
-import java.util.List;
-
 
 @Data
 @AllArgsConstructor
