@@ -1,5 +1,6 @@
 package org.gosky.parsing;
 
+import lombok.extern.slf4j.Slf4j;
 import org.gosky.annotations.Delete;
 import org.gosky.annotations.Insert;
 import org.gosky.annotations.Select;
@@ -12,15 +13,17 @@ import org.gosky.util.CollectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * mapper映射解析
  */
+@Slf4j
 public class MapperHandler {
-    public static Map<String, String> sqlMapper;
+
+
+    public static List<MethodMapper> methodMapperList;
+    public static Map<Class<?>, List<MethodMapper>> sqlMapper;
 
     /**
      * 注解解析功能
@@ -29,12 +32,13 @@ public class MapperHandler {
      * @param packageName
      */
     public void parsingInterface(String packageName) {
+        log.info("handle annotations start ....");
         Set<Class<?>> mapperInterfaceSet = ClassHelper.getMapperInterfaceSet();
         if (!CollectionUtils.isEmpty(mapperInterfaceSet)) {
-            MapperSQL mapperSQL = new MapperSQL();
-            List<MethodMapper> list = new ArrayList<>();
+            sqlMapper = new HashMap<>(mapperInterfaceSet.size());
+            methodMapperList = new ArrayList<>();
             mapperInterfaceSet.forEach(cls -> {
-                mapperSQL.setClazz(cls);
+                sqlMapper.put(cls, methodMapperList);
                 Method[] methods = cls.getMethods();
                 if (methods.length > 0) {
                     Arrays.stream(methods).forEach(method -> {
@@ -42,12 +46,7 @@ public class MapperHandler {
                         String simpleName = annotations[0].annotationType().getSimpleName();
                         //获取SQL类型
                         SQLType sqlType = SQLType.covertToSQLType(simpleName);
-                        //构建方法SQL映射
-                        MethodMapper methodMapper = MethodMapper.builder().methodName(method.getName())
-                                .returnType(method.getReturnType())
-                                .parameterTypes(method.getParameterTypes()).build();
-
-                        String[] value;
+                        String[] value = {};
                         switch (sqlType) {
                             case INSERT:
                                 Insert inserts = (Insert) annotations[0];
@@ -68,16 +67,17 @@ public class MapperHandler {
                             default:
                                 break;
                         }
-
+                        //构建方法SQL映射
+                        methodMapperList.add(MethodMapper.builder().methodName(method.getName())
+                                .returnType(method.getReturnType())
+                                .parameterTypes(method.getParameterTypes())
+                                .sql(value[0])
+                                .sqlType(sqlType)
+                                .build());
                     });
-
                 }
             });
         }
+        log.info("handle annotations end ....");
     }
-
-    private Consumer annotion() {
-        return null;
-    }
-
 }
