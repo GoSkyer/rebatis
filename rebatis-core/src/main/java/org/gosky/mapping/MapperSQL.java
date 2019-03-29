@@ -5,12 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 接口SQL映射
+ * 接口映射
  */
 @Data
 @AllArgsConstructor
@@ -20,7 +19,7 @@ public class MapperSQL {
     private String name;
     private Class<?> clazz;
     Map<String, String> methodSQL;
-    private List<String> sqlList;
-    private List<Method> methodList;
     private String[] value;
+    private List<MethodMapper> list;
+
 }

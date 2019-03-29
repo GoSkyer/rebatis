@@ -8,10 +8,10 @@ import java.util.Arrays;
  */
 public enum SQLType {
 
-    UPDATE("update"),
-    INSERT("insert"),
-    DELETE("delete"),
-    SELECT("select");
+    UPDATE("Update"),
+    INSERT("Insert"),
+    DELETE("Delete"),
+    SELECT("Select");
 
 
     SQLType(String type) {

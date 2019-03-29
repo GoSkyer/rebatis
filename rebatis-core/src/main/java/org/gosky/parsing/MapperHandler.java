@@ -6,11 +6,13 @@ import org.gosky.annotations.Select;
 import org.gosky.annotations.Update;
 import org.gosky.common.SQLType;
 import org.gosky.mapping.MapperSQL;
+import org.gosky.mapping.MethodMapper;
 import org.gosky.util.ClassHelper;
 import org.gosky.util.CollectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -30,18 +32,21 @@ public class MapperHandler {
         Set<Class<?>> mapperInterfaceSet = ClassHelper.getMapperInterfaceSet();
         if (!CollectionUtils.isEmpty(mapperInterfaceSet)) {
             MapperSQL mapperSQL = new MapperSQL();
+            List<MethodMapper> list = new ArrayList<>();
             mapperInterfaceSet.forEach(cls -> {
                 mapperSQL.setClazz(cls);
                 Method[] methods = cls.getMethods();
-                mapperSQL.setMethodList(Arrays.asList(methods));
-
-                List<String> sqlList = new ArrayList<>(methods.length);
-
                 if (methods.length > 0) {
                     Arrays.stream(methods).forEach(method -> {
                         Annotation[] annotations = method.getDeclaredAnnotations();
                         String simpleName = annotations[0].annotationType().getSimpleName();
+                        //获取SQL类型
                         SQLType sqlType = SQLType.covertToSQLType(simpleName);
+                        //构建方法SQL映射
+                        MethodMapper methodMapper = MethodMapper.builder().methodName(method.getName())
+                                .returnType(method.getReturnType())
+                                .parameterTypes(method.getParameterTypes()).build();
+
                         String[] value;
                         switch (sqlType) {
                             case INSERT:
