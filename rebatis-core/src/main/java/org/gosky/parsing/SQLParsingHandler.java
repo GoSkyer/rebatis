@@ -1,5 +1,7 @@
 package org.gosky.parsing;
 
+import org.gosky.mapping.MapperHandler;
+
 /**
  * SQL解析处理
  */
@@ -7,19 +9,18 @@ public class SQLParsingHandler {
 
 
     public void parsingSQL() {
-        String sql = "update set name  #{name} where id =#{id}";
-        int i = sql.indexOf("#");
-        int i1 = sql.indexOf("}");
-        System.out.println(sql.substring(i + 1, i1));
+        String sql = "update user set name = #{name} where id =#{id}";
         StringBuilder stringBuilder = new StringBuilder(sql);
-        String substring = stringBuilder.substring(i, i1 + 1);
-        StringBuilder hello = stringBuilder.replace(i, i1 + 1, "hello");
-        System.out.println(substring);
-        System.out.println(hello);
-
+        while (stringBuilder.indexOf("#") > 0) {
+            int open = stringBuilder.indexOf("{");
+            int close = stringBuilder.indexOf("}");
+            stringBuilder.replace(open - 1, close + 1, "hello");
+            System.out.println(stringBuilder);
+        }
     }
 
     public static void main(String[] args) {
+        new MapperHandler().parsingInterface("org.gosky.mapping");
         new SQLParsingHandler().parsingSQL();
 
     }

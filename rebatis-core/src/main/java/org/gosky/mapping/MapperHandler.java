@@ -1,4 +1,4 @@
-package org.gosky.parsing;
+package org.gosky.mapping;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gosky.annotations.Delete;
@@ -38,6 +38,7 @@ public class MapperHandler {
             sqlMapper = new HashMap<>(mapperInterfaceSet.size());
             methodMapperList = new ArrayList<>();
             mapperInterfaceSet.forEach(cls -> {
+                System.out.println(cls.getName());
                 sqlMapper.put(cls, methodMapperList);
                 Method[] methods = cls.getMethods();
                 if (methods.length > 0) {

@@ -16,7 +16,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Builder
 public class MapperSQL {
-    private String name;
+    private String interfaceName;
     private Class<?> clazz;
     Map<String, String> methodSQL;
     private String[] value;

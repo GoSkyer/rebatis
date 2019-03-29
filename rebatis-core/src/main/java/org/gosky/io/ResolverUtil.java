@@ -38,7 +38,7 @@ import java.util.Set;
  * <p/>
  * <p>General searches are initiated by calling the
  * {@link #find(ResolverUtil.Test, String)} ()} method and supplying
- * a package name and a Test instance. This will cause the named package <b>and all sub-packages</b>
+ * a package interfaceName and a Test instance. This will cause the named package <b>and all sub-packages</b>
  * to be scanned for classes that meet the test. There are also utility methods for the common
  * use cases of scanning multiple packages for extensions of particular classes, or classes
  * annotated with a specific annotation.</p>
@@ -221,7 +221,7 @@ public class ResolverUtil<T> {
      * 主要的方法，找一个package下满足条件的所有类,被TypeHanderRegistry,MapperRegistry,TypeAliasRegistry调用
      *
      * @param test        an instance of {@link Test} that will be used to filter classes
-     * @param packageName the name of the package from which to start scanning for
+     * @param packageName the interfaceName of the package from which to start scanning for
      *                    classes, e.g. {@code net.sourceforge.stripes}
      */
     public ResolverUtil<T> find(Test test, String packageName) {
@@ -243,21 +243,21 @@ public class ResolverUtil<T> {
     }
 
     /**
-     * Converts a Java package name to a path that can be looked up with a call to
+     * Converts a Java package interfaceName to a path that can be looked up with a call to
      * {@link ClassLoader#getResources(String)}.
      *
-     * @param packageName The Java package name to convert to a path
+     * @param packageName The Java package interfaceName to convert to a path
      */
     protected String getPackagePath(String packageName) {
         return packageName == null ? null : packageName.replace('.', '/');
     }
 
     /**
-     * Add the class designated by the fully qualified class name provided to the set of
+     * Add the class designated by the fully qualified class interfaceName provided to the set of
      * resolved classes if and only if it is approved by the Test supplied.
      *
      * @param test the test used to determine if the class matches
-     * @param fqn  the fully qualified name of a class
+     * @param fqn  the fully qualified interfaceName of a class
      */
     @SuppressWarnings("unchecked")
     protected void addIfMatching(Test test, String fqn) {
