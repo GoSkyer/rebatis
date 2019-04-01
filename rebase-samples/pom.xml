@@ -13,7 +13,7 @@
     <artifactId>rebase-samples</artifactId>
     <packaging>war</packaging>
 
-    <name>rebase-samples Maven Webapp</name>
+    <type>rebase-samples Maven Webapp</type>
     <!-- FIXME change it to the project's website -->
     <url>http://www.example.com</url>
 

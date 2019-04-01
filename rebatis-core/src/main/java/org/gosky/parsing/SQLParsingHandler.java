@@ -4,6 +4,7 @@ import org.gosky.mapping.MapperHandler;
 
 /**
  * SQL解析处理
+ * @author zhiqin.zhang
  */
 public class SQLParsingHandler {
 
