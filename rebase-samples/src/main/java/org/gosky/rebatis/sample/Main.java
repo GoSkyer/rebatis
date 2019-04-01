@@ -47,6 +47,9 @@ public class Main {
         rebatis.create(TestMapper.class).test("select * from user")
                 .thenAccept(queryResult -> {
                     System.out.println("queryResult : " + queryResult.toString());
+
+                    User user = ResultSetMapper.parseResultSet(queryResult, User.class);
+                    System.out.println(user);
                 });
 
         while (true) {

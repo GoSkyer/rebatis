@@ -8,6 +8,8 @@ import org.gosky.executor.SimpleExecutor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -17,7 +19,7 @@ import java.lang.reflect.Proxy;
  */
 public class Rebatis {
 
-    //    private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
+    private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
     private final Executor executor;
 
     Rebatis(Executor executor) {
@@ -28,6 +30,7 @@ public class Rebatis {
     public <T> T create(final Class<T> mapper) {
         return (T) Proxy.newProxyInstance(mapper.getClassLoader(), new Class<?>[]{mapper},
                 new InvocationHandler() {
+                    private final Object[] emptyArgs = new Object[0];
 
                     @Override
                     public Object invoke(Object proxy, Method method,
@@ -43,7 +46,7 @@ public class Rebatis {
 
 //                        return loadServiceMethod(method).invoke(args != null ? args : emptyArgs);
                         // TODO: 2019-03-11 单独的mapperService 用于保存sql语句 adapter 等等
-                        return executor.query("select * from user", "");
+                        return executor.query((String) args[0], "");
                     }
                 });
     }

@@ -11,6 +11,7 @@
     <modules>
         <module>rebatis-core</module>
         <module>rebase-samples</module>
+        <module>rebatis-processor</module>
     </modules>
 
 
