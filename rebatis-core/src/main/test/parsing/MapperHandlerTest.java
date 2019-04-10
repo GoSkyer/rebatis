@@ -9,7 +9,5 @@ public class MapperHandlerTest {
     @Test
     public void test() {
         new MapperHandler().parsingInterface("org.gosky.mapping");
-
-
     }
 }
