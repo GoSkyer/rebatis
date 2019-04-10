@@ -63,7 +63,7 @@ public class TestProcessor extends AbstractProcessor {
                 ClassName.get(Class.class),
                 ClassName.get(Converter.class)
         ), "map")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                 .initializer("new HashMap<>()").build();
 
         // 创建init方法
@@ -77,7 +77,7 @@ public class TestProcessor extends AbstractProcessor {
                 TypeSpec pojoConvertClass = pojoProcessor(element);
                 ClassName name = ClassName.get("org.gosky.rebatis.apt.convert", pojoConvertClass.name);
                 initMethodBuilder.addStatement("$T $L = new $T()", name, pojoConvertClass.name, name);
-                initMethodBuilder.addStatement("map.put($L.class,$L)", pojoConvertClass.name, pojoConvertClass.name);
+                initMethodBuilder.addStatement("map.put($T.class,$L)", element, pojoConvertClass.name);
             }
 
 
@@ -175,5 +175,9 @@ public class TestProcessor extends AbstractProcessor {
         return typeSpec;
     }
 
+    public class ConvertTuple {
+        private String convertName;
+        private String pojoName;
+    }
 
 }

@@ -7,6 +7,7 @@ import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder;
 import com.github.jasync.sql.db.pool.ConnectionPool;
 
 import org.gosky.Rebatis;
+import org.gosky.rebatis.apt.RebatisConverterFactory;
 import org.gosky.rebatis.sample.mapper.TestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +48,10 @@ public class Main {
         rebatis.create(TestMapper.class).test("select * from user")
                 .thenAccept(queryResult -> {
                     System.out.println("queryResult : " + queryResult.toString());
-
-                    User user = ResultSetMapper.parseResultSet(queryResult, User.class);
-                    System.out.println(user);
+                    RebatisConverterFactory rebatisConverterFactory = new RebatisConverterFactory();
+                    rebatisConverterFactory.init();
+                    User user = (User) rebatisConverterFactory.convert(queryResult, User.class);
+                    System.out.println("pojo" + user);
                 });
 
         while (true) {
