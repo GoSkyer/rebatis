@@ -33,7 +33,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
 @AutoService(Processor.class)
-public class TestProcessor extends AbstractProcessor {
+public class CoreProcessor extends AbstractProcessor {
 
 
     private Elements elementUtils;
@@ -128,6 +128,7 @@ public class TestProcessor extends AbstractProcessor {
         List<? extends Element> allElementMembers = elementUtils.getAllMembers((TypeElement) element).stream()
                 .filter(o -> ElementKind.FIELD.equals(((Element) o).getKind()))
                 .filter(o -> o instanceof VariableElement).collect(Collectors.toList());
+        // TODO: 2019-04-10 判断是否是list
         //生成set方法
         for (Element allElementMember : allElementMembers) {
             Name simpleName = allElementMember.getSimpleName();
