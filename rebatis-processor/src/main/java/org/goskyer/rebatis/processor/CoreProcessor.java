@@ -1,6 +1,6 @@
 package org.goskyer.rebatis.processor;
 
-import com.github.jasync.sql.db.QueryResult;
+import com.github.jasync.sql.db.RowData;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -12,6 +12,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import org.gosky.converter.Converter;
 import org.gosky.converter.ConverterFactory;
+import org.gosky.converter.Entity;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -87,10 +88,10 @@ public class CoreProcessor extends AbstractProcessor {
         MethodSpec convertMethod = MethodSpec.methodBuilder("convert")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addAnnotation(Override.class)
-                .addParameter(QueryResult.class, "qr")
+                .addParameter(RowData.class, "rowData")
                 .addParameter(Class.class, "pojoClass")
                 .returns(Object.class)
-                .addCode("return map.get(pojoClass).convert(qr);")
+                .addCode("return map.get(pojoClass).convert(rowData);")
                 .build();
 
         //生成class属性
@@ -122,19 +123,18 @@ public class CoreProcessor extends AbstractProcessor {
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
                 .returns(typeName)
-                .addParameter(QueryResult.class, "qr")
+                .addParameter(RowData.class, "rowData")
                 .addStatement("$T _$L = new $T()", typeName, pojoName, typeName);
         // 获取entity内部的field
         List<? extends Element> allElementMembers = elementUtils.getAllMembers((TypeElement) element).stream()
                 .filter(o -> ElementKind.FIELD.equals(((Element) o).getKind()))
                 .filter(o -> o instanceof VariableElement).collect(Collectors.toList());
-        // TODO: 2019-04-10 判断是否是list
         //生成set方法
         for (Element allElementMember : allElementMembers) {
             Name simpleName = allElementMember.getSimpleName();
             CharSequence charSequence = simpleName.subSequence(0, 1);
             String s = charSequence.toString().toUpperCase() + simpleName.subSequence(1, simpleName.length());
-            convertBuilder.addStatement("_$L.set$L(qr.getRows().get(0).getAs($S))", pojoName, s, simpleName);
+            convertBuilder.addStatement("_$L.set$L(rowData.getAs($S))", pojoName, s, simpleName);
         }
         //添加return
         MethodSpec convertMethod = convertBuilder.addStatement("return _$L", pojoName).build();

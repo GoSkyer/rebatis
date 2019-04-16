@@ -1,6 +1,6 @@
 package org.gosky.rebatis.sample;
 
-import com.github.jasync.sql.db.QueryResult;
+import com.github.jasync.sql.db.RowData;
 
 import org.gosky.converter.Converter;
 import org.gosky.converter.ConverterFactory;
@@ -23,7 +23,9 @@ public class TestConverterFactory implements ConverterFactory {
     }
 
     @Override
-    public Object convert(QueryResult qr, Class pojoClass) {
-        return map.get(pojoClass).convert(qr);
+    public Object convert(RowData qr, Class pojoClass) {
+        return null;
     }
+
+
 }

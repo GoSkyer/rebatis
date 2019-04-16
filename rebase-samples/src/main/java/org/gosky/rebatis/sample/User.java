@@ -1,6 +1,6 @@
 package org.gosky.rebatis.sample;
 
-import org.goskyer.rebatis.processor.Entity;
+import org.gosky.converter.Entity;
 
 /**
  * @Auther: guozhong

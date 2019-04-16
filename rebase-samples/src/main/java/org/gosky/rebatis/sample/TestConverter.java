@@ -1,6 +1,6 @@
 package org.gosky.rebatis.sample;
 
-import com.github.jasync.sql.db.QueryResult;
+import com.github.jasync.sql.db.RowData;
 
 import org.gosky.converter.Converter;
 
@@ -12,9 +12,8 @@ import org.gosky.converter.Converter;
 public class TestConverter implements Converter {
 
     @Override
-    public User convert(QueryResult qr) {
-        User user = new User();
-        return user;
+    public Object convert(RowData rowData) {
+        return null;
     }
 
     @Override

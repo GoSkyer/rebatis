@@ -46,7 +46,7 @@ public class ParserBenchmarkTest {
                     long l = System.currentTimeMillis();
                     System.out.println("start ---->");
                     for (int i = 0; i < 1000 * 1000; i++) {
-                        User user = (User) rebatisConverterFactory.convert(queryResult, User.class);
+                        User user = (User) rebatisConverterFactory.convert(queryResult.getRows().get(0), User.class);
 
                     }
                     System.out.println("end ---->" + (System.currentTimeMillis() - l));

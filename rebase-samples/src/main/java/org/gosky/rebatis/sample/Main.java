@@ -5,13 +5,16 @@ import com.github.jasync.sql.db.ConnectionPoolConfigurationBuilder;
 import com.github.jasync.sql.db.mysql.MySQLConnection;
 import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder;
 import com.github.jasync.sql.db.pool.ConnectionPool;
+import com.google.common.reflect.TypeToken;
 
 import org.gosky.Rebatis;
+import org.gosky.converter.PreConverter;
 import org.gosky.rebatis.apt.RebatisConverterFactory;
 import org.gosky.rebatis.sample.mapper.TestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import kotlin.Unit;
@@ -45,13 +48,20 @@ public class Main {
         });
 
         Rebatis rebatis = new Rebatis.Builder(connectionPool).build();
-        rebatis.create(TestMapper.class).test("select * from user")
+        rebatis.create(TestMapper.class).test("select id from user")
                 .thenAccept(queryResult -> {
                     System.out.println("queryResult : " + queryResult.toString());
                     RebatisConverterFactory rebatisConverterFactory = new RebatisConverterFactory();
-                    rebatisConverterFactory.init();
-                    User user = (User) rebatisConverterFactory.convert(queryResult, User.class);
-                    System.out.println("pojo" + user);
+                    PreConverter preConverter = new PreConverter();
+                    try {
+                        TypeToken listTypeToken = new TypeToken<List<Integer>>(){};
+                        List<Integer> user = (List<Integer>) preConverter.with(rebatisConverterFactory).convert(queryResult, listTypeToken.getType());
+//                    List<User> user = (List<User>) rebatisConverterFactory.convert(queryResult, User.class);
+                        System.out.println("pojo" + user);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 });
 
         while (true) {

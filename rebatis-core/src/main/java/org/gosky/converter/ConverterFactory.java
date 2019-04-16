@@ -1,6 +1,6 @@
 package org.gosky.converter;
 
-import com.github.jasync.sql.db.QueryResult;
+import com.github.jasync.sql.db.RowData;
 
 /**
  * @Auther: guozhong
@@ -11,7 +11,7 @@ public interface ConverterFactory {
 
     void init();
 
-    Object convert(QueryResult qr, Class pojoClass);
+    Object convert(RowData qr, Class pojoClass);
 
 
 }

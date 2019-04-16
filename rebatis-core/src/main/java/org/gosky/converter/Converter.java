@@ -1,6 +1,6 @@
 package org.gosky.converter;
 
-import com.github.jasync.sql.db.QueryResult;
+import com.github.jasync.sql.db.RowData;
 
 /**
  * @Auther: guozhong
@@ -8,7 +8,7 @@ import com.github.jasync.sql.db.QueryResult;
  * @Description:
  */
 public interface Converter {
-    Object convert(QueryResult qr);
+    Object convert(RowData rowData);
 
     String getName();
 
