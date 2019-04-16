@@ -15,8 +15,6 @@
  */
 package parsing;
 
-import org.gosky.parsing.GenericTokenParser;
-import org.gosky.parsing.TokenHandler;
 import org.junit.Test;
 
 import java.util.HashMap;

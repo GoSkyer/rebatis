@@ -16,8 +16,6 @@
 package parsing;
 
 import org.gosky.io.Resources;
-import org.gosky.parsing.XNode;
-import org.gosky.parsing.XPathParser;
 import org.junit.Test;
 
 import java.io.InputStream;
