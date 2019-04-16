@@ -56,7 +56,7 @@ public class Main {
                     try {
                         TypeToken listTypeToken = new TypeToken<List<Integer>>(){};
                         List<Integer> user = (List<Integer>) preConverter.with(rebatisConverterFactory).convert(queryResult, listTypeToken.getType());
-//                    List<User> user = (List<User>) rebatisConverterFactory.convert(queryResult, User.class);
+//                    LIST<User> user = (LIST<User>) rebatisConverterFactory.convert(queryResult, User.class);
                         System.out.println("pojo" + user);
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -5,9 +5,8 @@ import org.gosky.annotations.Delete;
 import org.gosky.annotations.Insert;
 import org.gosky.annotations.Select;
 import org.gosky.annotations.Update;
+import org.gosky.common.ReturnTypeEnum;
 import org.gosky.common.SQLType;
-import org.gosky.mapping.MapperSQL;
-import org.gosky.mapping.MethodMapper;
 import org.gosky.util.ClassHelper;
 import org.gosky.util.CollectionUtils;
 
@@ -68,17 +67,40 @@ public class MapperHandler {
                             default:
                                 break;
                         }
+
+                        ReturnTypeEnum returnTypeEnum;
+                        switch (method.getReturnType().getSimpleName()) {
+                            case "void":
+                                returnTypeEnum = ReturnTypeEnum.VOID;
+                                break;
+                            case "java.util.List":
+                                returnTypeEnum = ReturnTypeEnum.LIST;
+                                break;
+                            case "java.util.Map":
+                                returnTypeEnum = ReturnTypeEnum.MAP;
+                                break;
+                            default:
+                                returnTypeEnum = ReturnTypeEnum.SINGLE;
+                                break;
+                        }
                         //构建方法SQL映射
                         methodMapperList.add(MethodMapper.builder().methodName(method.getName())
                                 .returnType(method.getReturnType())
+                                .returnTypeEnum(returnTypeEnum)
                                 .parameterTypes(method.getParameterTypes())
                                 .sql(value[0])
                                 .sqlType(sqlType)
                                 .build());
+
                     });
                 }
             });
         }
         log.info("handle annotations end ....");
+    }
+
+    public static void main(String[] args) {
+        ReturnTypeEnum aVoid = ReturnTypeEnum.valueOf("VOID");
+        System.out.println(aVoid.name());
     }
 }

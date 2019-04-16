@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * 接口映射
+ *
  */
 @Data
 @AllArgsConstructor

@@ -229,7 +229,7 @@ public class ResolverUtil<T> {
 
 //        try {
 //            //通过VFS来深入jar包里面去找一个class
-//            List<String> children = VFS.getInstance().methodMapperList(path);
+//            LIST<String> children = VFS.getInstance().methodMapperList(path);
 //            for (String child : children) {
 //                if (child.endsWith(".class")) {
 //                    addIfMatching(test, child);
