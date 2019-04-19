@@ -1,16 +1,22 @@
 package org.gosky;
 
+import com.github.jasync.sql.db.QueryResult;
 import com.github.jasync.sql.db.pool.ConnectionPool;
 
+import org.gosky.converter.ConverterFactory;
+import org.gosky.converter.PreConverter;
 import org.gosky.executor.Executor;
 import org.gosky.executor.SimpleExecutor;
 import org.gosky.mapping.MapperHandler;
 import org.gosky.mapping.MethodMapper;
+import org.gosky.util.Utils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -25,9 +31,11 @@ public class Rebatis {
     private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
     private final Executor executor;
     private MapperHandler mapperHandler = new MapperHandler();
+    private ConverterFactory converterFactory;
 
-    Rebatis(Executor executor) {
+    Rebatis(Executor executor, ConverterFactory converterFactory) {
         this.executor = executor;
+        this.converterFactory = converterFactory;
     }
 
     @SuppressWarnings("unchecked") // Single-interface proxy creation guarded by parameter safety.
@@ -54,7 +62,23 @@ public class Rebatis {
                             return methodMapper.getMethodName().equals(method.getName());
                         }).collect(Collectors.toList()).get(0);
 
-                        return executor.query(methodMapper1.getSql(), "");
+                        CompletableFuture<QueryResult> query = executor.query(methodMapper1.getSql(), "");
+
+                        PreConverter preConverter = new PreConverter();
+
+                        CompletableFuture<Object> objectCompletableFuture = query.thenApply(queryResult -> {
+                            try {
+                                return preConverter.with(converterFactory).convert(queryResult
+                                        , Utils.getParameterUpperBound(0, ((ParameterizedType) methodMapper1.getReturnType())));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return null;
+                        });
+
+//                        methodMapper1.getReturnType()
+
+                        return objectCompletableFuture;
                     }
                 });
     }
@@ -76,13 +100,19 @@ public class Rebatis {
 
     public static final class Builder {
         private final ConnectionPool connectionPool;
+        private ConverterFactory converterFactor;
 
         public Builder(ConnectionPool connectionPool) {
             this.connectionPool = connectionPool;
         }
 
+        public Builder setConverterFactory(ConverterFactory converterFactory) {
+            this.converterFactor = converterFactory;
+            return this;
+        }
+
         public Rebatis build() {
-            return new Rebatis(new SimpleExecutor(connectionPool));
+            return new Rebatis(new SimpleExecutor(connectionPool), converterFactor);
         }
     }
 }

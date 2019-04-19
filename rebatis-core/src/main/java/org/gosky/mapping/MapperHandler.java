@@ -97,7 +97,7 @@ public class MapperHandler {
                         }
                         //构建方法SQL映射
                         methodMapperList.add(MethodMapper.builder().methodName(method.getName())
-                                .returnType(method.getReturnType())
+                                .returnType(method.getGenericReturnType())
                                 .returnTypeEnum(returnTypeEnum)
                                 .parameterTypes(method.getParameterTypes())
                                 .sql(value[0])

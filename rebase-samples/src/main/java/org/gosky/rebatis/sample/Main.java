@@ -5,16 +5,13 @@ import com.github.jasync.sql.db.ConnectionPoolConfigurationBuilder;
 import com.github.jasync.sql.db.mysql.MySQLConnection;
 import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder;
 import com.github.jasync.sql.db.pool.ConnectionPool;
-import com.google.common.reflect.TypeToken;
 
 import org.gosky.Rebatis;
-import org.gosky.converter.PreConverter;
 import org.gosky.rebatis.apt.RebatisConverterFactory;
 import org.gosky.rebatis.sample.mapper.TestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import kotlin.Unit;
@@ -46,21 +43,23 @@ public class Main {
                 return Unit.INSTANCE;
             }
         });
+        RebatisConverterFactory rebatisConverterFactory = new RebatisConverterFactory();
 
-        Rebatis rebatis = new Rebatis.Builder(connectionPool).build();
+        Rebatis rebatis = new Rebatis.Builder(connectionPool)
+                .setConverterFactory(rebatisConverterFactory)
+                .build();
         rebatis.create(TestMapper.class).test()
                 .thenAccept(queryResult -> {
                     System.out.println("queryResult : " + queryResult.toString());
-                    RebatisConverterFactory rebatisConverterFactory = new RebatisConverterFactory();
-                    PreConverter preConverter = new PreConverter();
-                    try {
-                        TypeToken listTypeToken = new TypeToken<List<User>>(){};
-                        List<User> user = (List<User>) preConverter.with(rebatisConverterFactory).convert(queryResult, listTypeToken.getType());
-//                    LIST<User> user = (LIST<User>) rebatisConverterFactory.convert(queryResult, User.class);
-                        System.out.println("pojo" + user);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+//                    PreConverter preConverter = new PreConverter();
+//                    try {
+//                        TypeToken listTypeToken = new TypeToken<List<User>>(){};
+//                        List<User> user = (List<User>) preConverter.with(rebatisConverterFactory).convert(queryResult, listTypeToken.getType());
+////                    LIST<User> user = (LIST<User>) rebatisConverterFactory.convert(queryResult, User.class);
+//                        System.out.println("pojo" + user);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
 
                 });
 
