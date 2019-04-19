@@ -27,6 +27,7 @@ public class MapperHandler {
     /**
      * 注解解析功能
      * TODO 语句解析 and 参数解析
+     * TODO 返回值处理(包括泛型)
      *
      * @param packageName
      */
@@ -91,16 +92,10 @@ public class MapperHandler {
                                 .sql(value[0])
                                 .sqlType(sqlType)
                                 .build());
-
                     });
                 }
             });
         }
         log.info("handle annotations end ....");
-    }
-
-    public static void main(String[] args) {
-        ReturnTypeEnum aVoid = ReturnTypeEnum.valueOf("VOID");
-        System.out.println(aVoid.name());
     }
 }

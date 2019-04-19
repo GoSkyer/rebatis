@@ -4,7 +4,6 @@ import org.gosky.annotations.Mapper;
 import org.gosky.annotations.Select;
 import org.gosky.annotations.Update;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
