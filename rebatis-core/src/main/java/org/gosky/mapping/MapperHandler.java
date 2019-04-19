@@ -11,10 +11,8 @@ import org.gosky.util.CollectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,12 +25,16 @@ import lombok.extern.slf4j.Slf4j;
 public class MapperHandler {
 
 
-    public static List<MethodMapper> methodMapperList;
-    public static Map<Class<?>, List<MethodMapper>> sqlMapper;
-
+    private final Map<Method, ServiceMethod> methodMapperList = new HashMap<>();
+    private String packageName;
 
     public MapperHandler() {
-        parsingInterface("");
+        parsingInterface("org.gosky.rebatis.sample.mapper");
+    }
+
+
+    public Map<Method, ServiceMethod> getMethodMapperList() {
+        return methodMapperList;
     }
 
     /**
@@ -44,13 +46,10 @@ public class MapperHandler {
      */
     public void parsingInterface(String packageName) {
         log.info("handle annotations start ....");
-        Set<Class<?>> mapperInterfaceSet = ClassHelper.getMapperInterfaceSet();
+        Set<Class<?>> mapperInterfaceSet = ClassHelper.getInstance(packageName).getMapperInterfaceSet();
         if (!CollectionUtils.isEmpty(mapperInterfaceSet)) {
-            sqlMapper = new HashMap<>(mapperInterfaceSet.size());
-            methodMapperList = new ArrayList<>();
             mapperInterfaceSet.forEach(cls -> {
                 System.out.println(cls.getName());
-                sqlMapper.put(cls, methodMapperList);
                 Method[] methods = cls.getMethods();
                 if (methods.length > 0) {
                     Arrays.stream(methods).forEach(method -> {
@@ -96,7 +95,7 @@ public class MapperHandler {
                                 break;
                         }
                         //构建方法SQL映射
-                        methodMapperList.add(MethodMapper.builder().methodName(method.getName())
+                        methodMapperList.put(method, ServiceMethod.builder().methodName(method.getName())
                                 .returnType(method.getGenericReturnType())
                                 .returnTypeEnum(returnTypeEnum)
                                 .parameterTypes(method.getParameterTypes())

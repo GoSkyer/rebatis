@@ -49,7 +49,6 @@ public class CoreProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> set = new TreeSet<>();
-        set.add(Test.class.getCanonicalName());
         set.add(Entity.class.getCanonicalName());
         return set;
     }

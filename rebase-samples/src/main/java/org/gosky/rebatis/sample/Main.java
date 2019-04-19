@@ -43,24 +43,16 @@ public class Main {
                 return Unit.INSTANCE;
             }
         });
+
         RebatisConverterFactory rebatisConverterFactory = new RebatisConverterFactory();
 
         Rebatis rebatis = new Rebatis.Builder(connectionPool)
                 .setConverterFactory(rebatisConverterFactory)
                 .build();
+
         rebatis.create(TestMapper.class).test()
                 .thenAccept(queryResult -> {
                     System.out.println("queryResult : " + queryResult.toString());
-//                    PreConverter preConverter = new PreConverter();
-//                    try {
-//                        TypeToken listTypeToken = new TypeToken<List<User>>(){};
-//                        List<User> user = (List<User>) preConverter.with(rebatisConverterFactory).convert(queryResult, listTypeToken.getType());
-////                    LIST<User> user = (LIST<User>) rebatisConverterFactory.convert(queryResult, User.class);
-//                        System.out.println("pojo" + user);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-
                 });
 
         while (true) {

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MethodMapper {
+public class ServiceMethod {
     private String methodName;
     private String sql;
     private SQLType sqlType;

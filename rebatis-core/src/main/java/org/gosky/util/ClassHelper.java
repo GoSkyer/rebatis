@@ -16,19 +16,23 @@ public final class ClassHelper {
     /**
      * 定义集合类（用于存放加载的类）
      */
-    private static Set<Class<?>> CLASS_SET;
+    private Set<Class<?>> CLASS_SET;
 
-    static {
-//        String basePackage = ConfigHelper.getAppBasePackage();
-        CLASS_SET = ClassUtil.getClassSet("org.gosky.rebatis.sample.mapper");
+    private ClassHelper(Set<Class<?>> CLASS_SET) {
+        this.CLASS_SET = CLASS_SET;
     }
+
+    public static ClassHelper getInstance(String basePackage) {
+        return new ClassHelper(ClassUtil.getClassSet(basePackage));
+    }
+
 
     /**
      * 获取包下的所有类
      *
      * @return
      */
-    public static Set<Class<?>> getClassSet() {
+    public Set<Class<?>> getClassSet() {
         return CLASS_SET;
     }
 
@@ -37,7 +41,7 @@ public final class ClassHelper {
      *
      * @return
      */
-    public static Set<Class<?>> getMapperInterfaceSet() {
+    public Set<Class<?>> getMapperInterfaceSet() {
         return CLASS_SET.stream().filter(cls -> cls.isAnnotationPresent(Mapper.class) && cls.isInterface()).collect(Collectors.toSet());
     }
 
@@ -48,7 +52,7 @@ public final class ClassHelper {
      * @param annotationClass
      * @return
      */
-    public static Set<Class<?>> getClassSetByAnnotation(Class<? extends Annotation> annotationClass) {
+    public Set<Class<?>> getClassSetByAnnotation(Class<? extends Annotation> annotationClass) {
         return CLASS_SET.stream().filter(cls -> cls.isAnnotationPresent(annotationClass)).collect(Collectors.toSet());
     }
 
@@ -58,7 +62,7 @@ public final class ClassHelper {
      * @param superClass
      * @return
      */
-    public static Set<Class<?>> getClassSetBySuper(Class<?> superClass) {
+    public Set<Class<?>> getClassSetBySuper(Class<?> superClass) {
         return CLASS_SET.stream().filter(cls -> superClass.isAssignableFrom(cls) && !superClass.equals(cls)).collect(Collectors.toSet());
     }
 

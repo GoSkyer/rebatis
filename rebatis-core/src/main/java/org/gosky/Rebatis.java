@@ -8,17 +8,14 @@ import org.gosky.converter.PreConverter;
 import org.gosky.executor.Executor;
 import org.gosky.executor.SimpleExecutor;
 import org.gosky.mapping.MapperHandler;
-import org.gosky.mapping.MethodMapper;
+import org.gosky.mapping.ServiceMethod;
 import org.gosky.util.Utils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 
 /**
@@ -28,7 +25,6 @@ import java.util.stream.Collectors;
  */
 public class Rebatis {
 
-    private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
     private final Executor executor;
     private MapperHandler mapperHandler = new MapperHandler();
     private ConverterFactory converterFactory;
@@ -58,44 +54,30 @@ public class Rebatis {
 
 //                        return loadServiceMethod(method).invoke(args != null ? args : emptyArgs);
                         // TODO: 2019-03-11 单独的mapperService 用于保存sql语句 adapter 等等
-                        MethodMapper methodMapper1 = mapperHandler.methodMapperList.stream().filter(methodMapper -> {
-                            return methodMapper.getMethodName().equals(method.getName());
-                        }).collect(Collectors.toList()).get(0);
+                        ServiceMethod serviceMethod = loadServiceMethod(method);
 
-                        CompletableFuture<QueryResult> query = executor.query(methodMapper1.getSql(), "");
+                        CompletableFuture<QueryResult> query = executor.query(serviceMethod.getSql(), "");
 
                         PreConverter preConverter = new PreConverter();
 
                         CompletableFuture<Object> objectCompletableFuture = query.thenApply(queryResult -> {
                             try {
                                 return preConverter.with(converterFactory).convert(queryResult
-                                        , Utils.getParameterUpperBound(0, ((ParameterizedType) methodMapper1.getReturnType())));
+                                        , Utils.getParameterUpperBound(0, ((ParameterizedType) serviceMethod.getReturnType())));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                             return null;
                         });
 
-//                        methodMapper1.getReturnType()
-
                         return objectCompletableFuture;
                     }
                 });
     }
 
-//    ServiceMethod<?> loadServiceMethod(Method method) {
-//        ServiceMethod<?> result = serviceMethodCache.get(method);
-//        if (result != null) return result;
-//
-//        synchronized (serviceMethodCache) {
-//            result = serviceMethodCache.get(method);
-//            if (result == null) {
-//                result = ServiceMethod.parseAnnotations(this, method);
-//                serviceMethodCache.put(method, result);
-//            }
-//        }
-//        return result;
-//    }
+    ServiceMethod loadServiceMethod(Method method) {
+        return mapperHandler.getMethodMapperList().get(method);
+    }
 
 
     public static final class Builder {
