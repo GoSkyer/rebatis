@@ -48,14 +48,14 @@ public class Main {
         });
 
         Rebatis rebatis = new Rebatis.Builder(connectionPool).build();
-        rebatis.create(TestMapper.class).test("select id from user")
+        rebatis.create(TestMapper.class).test()
                 .thenAccept(queryResult -> {
                     System.out.println("queryResult : " + queryResult.toString());
                     RebatisConverterFactory rebatisConverterFactory = new RebatisConverterFactory();
                     PreConverter preConverter = new PreConverter();
                     try {
-                        TypeToken listTypeToken = new TypeToken<List<Integer>>(){};
-                        List<Integer> user = (List<Integer>) preConverter.with(rebatisConverterFactory).convert(queryResult, listTypeToken.getType());
+                        TypeToken listTypeToken = new TypeToken<List<User>>(){};
+                        List<User> user = (List<User>) preConverter.with(rebatisConverterFactory).convert(queryResult, listTypeToken.getType());
 //                    LIST<User> user = (LIST<User>) rebatisConverterFactory.convert(queryResult, User.class);
                         System.out.println("pojo" + user);
                     } catch (Exception e) {

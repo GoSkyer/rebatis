@@ -2,6 +2,9 @@ package org.gosky.rebatis.sample.mapper;
 
 import com.github.jasync.sql.db.QueryResult;
 
+import org.gosky.annotations.Mapper;
+import org.gosky.annotations.Select;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -10,7 +13,9 @@ import java.util.concurrent.CompletableFuture;
  * @Description:
  */
 
-
+@Mapper
 public interface TestMapper {
-    CompletableFuture<QueryResult> test(String sql);
+
+    @Select("select * from user")
+    CompletableFuture<QueryResult> test();
 }

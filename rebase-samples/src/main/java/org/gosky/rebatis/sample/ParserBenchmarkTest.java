@@ -41,7 +41,7 @@ public class ParserBenchmarkTest {
         rebatisConverterFactory.init();
 
         Rebatis rebatis = new Rebatis.Builder(connectionPool).build();
-        rebatis.create(TestMapper.class).test("select * from user")
+        rebatis.create(TestMapper.class).test()
                 .thenAccept(queryResult -> {
                     long l = System.currentTimeMillis();
                     System.out.println("start ---->");

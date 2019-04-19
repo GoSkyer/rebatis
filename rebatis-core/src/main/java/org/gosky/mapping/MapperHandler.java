@@ -1,6 +1,5 @@
 package org.gosky.mapping;
 
-import lombok.extern.slf4j.Slf4j;
 import org.gosky.annotations.Delete;
 import org.gosky.annotations.Insert;
 import org.gosky.annotations.Select;
@@ -12,7 +11,14 @@ import org.gosky.util.CollectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * mapper映射解析
@@ -23,6 +29,11 @@ public class MapperHandler {
 
     public static List<MethodMapper> methodMapperList;
     public static Map<Class<?>, List<MethodMapper>> sqlMapper;
+
+
+    public MapperHandler() {
+        parsingInterface("");
+    }
 
     /**
      * 注解解析功能

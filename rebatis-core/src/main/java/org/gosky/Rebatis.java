@@ -4,12 +4,15 @@ import com.github.jasync.sql.db.pool.ConnectionPool;
 
 import org.gosky.executor.Executor;
 import org.gosky.executor.SimpleExecutor;
+import org.gosky.mapping.MapperHandler;
+import org.gosky.mapping.MethodMapper;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 
 /**
@@ -21,6 +24,7 @@ public class Rebatis {
 
     private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
     private final Executor executor;
+    private MapperHandler mapperHandler = new MapperHandler();
 
     Rebatis(Executor executor) {
         this.executor = executor;
@@ -46,7 +50,11 @@ public class Rebatis {
 
 //                        return loadServiceMethod(method).invoke(args != null ? args : emptyArgs);
                         // TODO: 2019-03-11 单独的mapperService 用于保存sql语句 adapter 等等
-                        return executor.query((String) args[0], "");
+                        MethodMapper methodMapper1 = mapperHandler.methodMapperList.stream().filter(methodMapper -> {
+                            return methodMapper.getMethodName().equals(method.getName());
+                        }).collect(Collectors.toList()).get(0);
+
+                        return executor.query(methodMapper1.getSql(), "");
                     }
                 });
     }

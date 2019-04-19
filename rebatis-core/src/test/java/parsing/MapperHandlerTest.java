@@ -16,5 +16,6 @@ public class MapperHandlerTest {
         MethodMapper methodMapper = methodMapperList.get(0);
         String sql = methodMapper.getSql();
         System.out.println(sql);
+        System.out.println(methodMapperList);
     }
 }

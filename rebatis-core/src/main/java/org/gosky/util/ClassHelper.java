@@ -4,7 +4,6 @@ package org.gosky.util;
 import org.gosky.annotations.Mapper;
 
 import java.lang.annotation.Annotation;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,7 @@ public final class ClassHelper {
 
     static {
 //        String basePackage = ConfigHelper.getAppBasePackage();
-        CLASS_SET = ClassUtil.getClassSet("org.gosky.mapping");
+        CLASS_SET = ClassUtil.getClassSet("org.gosky.rebatis.sample.mapper");
     }
 
     /**
