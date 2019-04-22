@@ -5,12 +5,13 @@ import com.github.jasync.sql.db.pool.ConnectionPool;
 import org.gosky.converter.ConverterFactory;
 import org.gosky.executor.Executor;
 import org.gosky.executor.SimpleExecutor;
-import org.gosky.mapping.MapperHandler;
 import org.gosky.mapping.ServiceMethod;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -21,7 +22,8 @@ import java.lang.reflect.Proxy;
 public class Rebatis {
 
     public final Executor executor;
-    private MapperHandler mapperHandler = new MapperHandler();
+    private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
+
     public final ConverterFactory converterFactory;
 
     Rebatis(Executor executor, ConverterFactory converterFactory) {
@@ -42,37 +44,23 @@ public class Rebatis {
                         if (method.getDeclaringClass() == Object.class) {
                             return method.invoke(this, args);
                         }
-//                        if (platform.isDefaultMethod(method)) {
-//                            return platform.invokeDefaultMethod(method, mapper, proxy, args);
-//                        }
-                        // TODO: 2019-03-11 java8 默认方法
-
-//                        return loadServiceMethod(method).invoke(args != null ? args : emptyArgs);
-                        ServiceMethod sqlFactory = loadServiceMethod(method);
-
-//                        CompletableFuture<QueryResult> query = executor.query(sqlFactory.getSql(), "");
-//
-//                        PreConverter preConverter = new PreConverter();
-//
-//                        CompletableFuture<Object> objectCompletableFuture = query.thenApply(queryResult -> {
-//                            try {
-//                                return preConverter.with(converterFactory).convert(queryResult
-//                                        , Utils.getParameterUpperBound(0, ((ParameterizedType) sqlFactory.getReturnType())));
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                            return null;
-//                        });
-
-                        Object invoke = sqlFactory.invoke(args);
-
-                        return invoke;
+                        return loadServiceMethod(method).invoke(args);
                     }
                 });
     }
 
     ServiceMethod loadServiceMethod(Method method) {
-        return ServiceMethod.parseAnnotations(this, method);
+        ServiceMethod<?> result = serviceMethodCache.get(method);
+        if (result != null) return result;
+
+        synchronized (serviceMethodCache) {
+            result = serviceMethodCache.get(method);
+            if (result == null) {
+                result = ServiceMethod.parseAnnotations(this, method);
+                serviceMethodCache.put(method, result);
+            }
+        }
+        return result;
     }
 
 

@@ -96,7 +96,7 @@ public class ServiceMethod<T> {
 
         PreConverter preConverter = new PreConverter();
 
-        CompletableFuture<Object> objectCompletableFuture = query.thenApply(queryResult -> {
+        return query.thenApply(queryResult -> {
             try {
                 return preConverter.with(converterFactory).convert(queryResult
                         , Utils.getParameterUpperBound(0, ((ParameterizedType) sqlFactory.getReturnType())));
@@ -105,8 +105,6 @@ public class ServiceMethod<T> {
             }
             return null;
         });
-
-        return objectCompletableFuture;
     }
 
     ;

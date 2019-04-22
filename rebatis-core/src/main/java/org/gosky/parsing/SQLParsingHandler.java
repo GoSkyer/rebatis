@@ -1,13 +1,12 @@
 package org.gosky.parsing;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.gosky.mapping.MapperHandler;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * SQL解析处理
@@ -42,7 +41,7 @@ public class SQLParsingHandler {
     }
 
     public static void main(String[] args) {
-        new MapperHandler().parsingInterface("org.gosky.mapping");
+//        new MapperHandler().parsingInterface("org.gosky.mapping");
         new SQLParsingHandler().parsingSQL("update user set name = #name} where id =#{id};");
 
     }
