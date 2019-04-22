@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.github.jasync-sql</groupId>
             <artifactId>jasync-mysql</artifactId>
-            <version>0.9.32</version>
+            <version>0.9.51</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>

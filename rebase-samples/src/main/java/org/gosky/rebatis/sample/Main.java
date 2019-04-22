@@ -1,7 +1,6 @@
 package org.gosky.rebatis.sample;
 
 
-import com.github.jasync.sql.db.ConnectionPoolConfigurationBuilder;
 import com.github.jasync.sql.db.mysql.MySQLConnection;
 import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder;
 import com.github.jasync.sql.db.pool.ConnectionPool;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.TimeUnit;
 
 import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
 
 
 /**
@@ -28,26 +26,24 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ConnectionPool<MySQLConnection> connectionPool = MySQLConnectionBuilder.createConnectionPool(new Function1<ConnectionPoolConfigurationBuilder, Unit>() {
-            @Override
-            public Unit invoke(ConnectionPoolConfigurationBuilder t) {
-                t.setUsername("root");
-                t.setHost("localhost");
-                t.setPort(3306);
-                t.setPassword("123456");
-                t.setDatabase("test");
-                t.setMaxActiveConnections(100);
-                t.setMaxIdleTime(TimeUnit.MINUTES.toMillis(15));
-                t.setMaxPendingQueries(10_000);
-                t.setConnectionValidationInterval(TimeUnit.SECONDS.toMillis(30));
-                return Unit.INSTANCE;
-            }
+        ConnectionPool<MySQLConnection> connectionPool = MySQLConnectionBuilder.createConnectionPool(t -> {
+            t.setUsername("root");
+            t.setHost("localhost");
+            t.setPort(3306);
+            t.setPassword("123456");
+            t.setDatabase("test");
+            t.setMaxActiveConnections(100);
+            t.setMaxIdleTime(TimeUnit.MINUTES.toMillis(15));
+            t.setMaxPendingQueries(10_000);
+            t.setConnectionValidationInterval(TimeUnit.SECONDS.toMillis(30));
+            return Unit.INSTANCE;
         });
 
         RebatisConverterFactory rebatisConverterFactory = new RebatisConverterFactory();
 
-        Rebatis rebatis = new Rebatis.Builder(connectionPool)
-                .setConverterFactory(rebatisConverterFactory)
+        Rebatis rebatis = new Rebatis.Builder()
+                .connectionPool(connectionPool)
+//                .converterFactory()
                 .build();
 
         rebatis.create(TestMapper.class).test()

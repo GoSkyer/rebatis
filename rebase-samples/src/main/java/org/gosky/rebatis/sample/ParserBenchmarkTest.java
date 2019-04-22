@@ -40,7 +40,7 @@ public class ParserBenchmarkTest {
         RebatisConverterFactory rebatisConverterFactory = new RebatisConverterFactory();
         rebatisConverterFactory.init();
 
-        Rebatis rebatis = new Rebatis.Builder(connectionPool).build();
+        Rebatis rebatis = new Rebatis.Builder().connectionPool(connectionPool).build();
         rebatis.create(TestMapper.class).test()
                 .thenAccept(queryResult -> {
 //                    long l = System.currentTimeMillis();

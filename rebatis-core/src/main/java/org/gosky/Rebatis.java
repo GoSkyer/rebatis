@@ -23,7 +23,6 @@ public class Rebatis {
 
     public final Executor executor;
     private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
-
     public final ConverterFactory converterFactory;
 
     Rebatis(Executor executor, ConverterFactory converterFactory) {
@@ -49,7 +48,7 @@ public class Rebatis {
                 });
     }
 
-    ServiceMethod loadServiceMethod(Method method) {
+    private ServiceMethod loadServiceMethod(Method method) {
         ServiceMethod<?> result = serviceMethodCache.get(method);
         if (result != null) return result;
 
@@ -65,19 +64,34 @@ public class Rebatis {
 
 
     public static final class Builder {
-        private final ConnectionPool connectionPool;
+        private ConnectionPool connectionPool;
         private ConverterFactory converterFactor;
 
-        public Builder(ConnectionPool connectionPool) {
+        public Builder connectionPool(ConnectionPool connectionPool) {
             this.connectionPool = connectionPool;
+            return this;
         }
 
-        public Builder setConverterFactory(ConverterFactory converterFactory) {
+        public Builder converterFactory(ConverterFactory converterFactory) {
             this.converterFactor = converterFactory;
             return this;
         }
 
         public Rebatis build() {
+
+            if (connectionPool == null) {
+                throw new IllegalStateException("connectionPool required.");
+            }
+
+            if (converterFactor == null) {
+                try {
+                    this.converterFactor = (ConverterFactory) Class.forName("org.gosky.rebatis.apt.RebatisConverterFactory").newInstance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new IllegalStateException("converterFactor required.");
+                }
+            }
+
             return new Rebatis(new SimpleExecutor(connectionPool), converterFactor);
         }
     }
