@@ -24,14 +24,27 @@ import java.util.stream.Stream;
  * @Date: 2019-04-14 23:19
  * @Description:
  */
-public class PreConverter {
+public class ConverterUtil {
     private ConverterFactory converterFactory;
+    private static ConverterUtil singleton;
 
-    public PreConverter with(ConverterFactory converterFactory) {
+    public ConverterUtil(ConverterFactory converterFactory) {
         this.converterFactory = converterFactory;
-        converterFactory.init();
-        return this;
     }
+
+    public static ConverterUtil with(ConverterFactory converterFactory) {
+        if (singleton == null) {
+            synchronized (ConverterUtil.class) {
+                if (singleton == null) {
+                    singleton = new ConverterUtil(converterFactory);
+                    converterFactory.init();
+                }
+            }
+        }
+        return singleton;
+    }
+
+
 
 
     public Object convert(QueryResult qr, Type type) throws Exception {

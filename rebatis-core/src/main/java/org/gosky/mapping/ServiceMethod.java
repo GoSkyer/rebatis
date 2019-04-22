@@ -10,7 +10,7 @@ import org.gosky.annotations.Update;
 import org.gosky.common.ReturnTypeEnum;
 import org.gosky.common.SQLType;
 import org.gosky.converter.ConverterFactory;
-import org.gosky.converter.PreConverter;
+import org.gosky.converter.ConverterUtil;
 import org.gosky.executor.Executor;
 import org.gosky.util.Utils;
 
@@ -94,11 +94,9 @@ public class ServiceMethod<T> {
     public CompletableFuture<Object> invoke(Object[] args) {
         CompletableFuture<QueryResult> query = executor.query(sqlFactory.getSql(), "");
 
-        PreConverter preConverter = new PreConverter();
-
         return query.thenApply(queryResult -> {
             try {
-                return preConverter.with(converterFactory).convert(queryResult
+                return ConverterUtil.with(converterFactory).convert(queryResult
                         , Utils.getParameterUpperBound(0, ((ParameterizedType) sqlFactory.getReturnType())));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -106,6 +104,4 @@ public class ServiceMethod<T> {
             return null;
         });
     }
-
-    ;
 }
