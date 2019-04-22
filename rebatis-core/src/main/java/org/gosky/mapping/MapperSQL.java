@@ -21,6 +21,6 @@ public class MapperSQL {
     private Class<?> clazz;
     Map<String, String> methodSQL;
     private String[] value;
-    private List<ServiceMethod> list;
+    private List<SqlFactory> list;
 
 }

@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MapperHandler {
 
 
-    private final Map<Method, ServiceMethod> methodMapperList = new HashMap<>();
+    private final Map<Method, SqlFactory> methodMapperList = new HashMap<>();
     private String packageName;
 
     public MapperHandler() {
@@ -33,7 +33,7 @@ public class MapperHandler {
     }
 
 
-    public Map<Method, ServiceMethod> getMethodMapperList() {
+    public Map<Method, SqlFactory> getMethodMapperList() {
         return methodMapperList;
     }
 
@@ -95,7 +95,7 @@ public class MapperHandler {
                                 break;
                         }
                         //构建方法SQL映射
-                        methodMapperList.put(method, ServiceMethod.builder().methodName(method.getName())
+                        methodMapperList.put(method, SqlFactory.builder().methodName(method.getName())
                                 .returnType(method.getGenericReturnType())
                                 .returnTypeEnum(returnTypeEnum)
                                 .parameterTypes(method.getParameterTypes())

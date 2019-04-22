@@ -1,21 +1,16 @@
 package org.gosky;
 
-import com.github.jasync.sql.db.QueryResult;
 import com.github.jasync.sql.db.pool.ConnectionPool;
 
 import org.gosky.converter.ConverterFactory;
-import org.gosky.converter.PreConverter;
 import org.gosky.executor.Executor;
 import org.gosky.executor.SimpleExecutor;
 import org.gosky.mapping.MapperHandler;
 import org.gosky.mapping.ServiceMethod;
-import org.gosky.util.Utils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
-import java.util.concurrent.CompletableFuture;
 
 
 /**
@@ -25,9 +20,9 @@ import java.util.concurrent.CompletableFuture;
  */
 public class Rebatis {
 
-    private final Executor executor;
+    public final Executor executor;
     private MapperHandler mapperHandler = new MapperHandler();
-    private ConverterFactory converterFactory;
+    public final ConverterFactory converterFactory;
 
     Rebatis(Executor executor, ConverterFactory converterFactory) {
         this.executor = executor;
@@ -53,30 +48,31 @@ public class Rebatis {
                         // TODO: 2019-03-11 java8 默认方法
 
 //                        return loadServiceMethod(method).invoke(args != null ? args : emptyArgs);
-                        // TODO: 2019-03-11 单独的mapperService 用于保存sql语句 adapter 等等
-                        ServiceMethod serviceMethod = loadServiceMethod(method);
+                        ServiceMethod sqlFactory = loadServiceMethod(method);
 
-                        CompletableFuture<QueryResult> query = executor.query(serviceMethod.getSql(), "");
+//                        CompletableFuture<QueryResult> query = executor.query(sqlFactory.getSql(), "");
+//
+//                        PreConverter preConverter = new PreConverter();
+//
+//                        CompletableFuture<Object> objectCompletableFuture = query.thenApply(queryResult -> {
+//                            try {
+//                                return preConverter.with(converterFactory).convert(queryResult
+//                                        , Utils.getParameterUpperBound(0, ((ParameterizedType) sqlFactory.getReturnType())));
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                            return null;
+//                        });
 
-                        PreConverter preConverter = new PreConverter();
+                        Object invoke = sqlFactory.invoke(args);
 
-                        CompletableFuture<Object> objectCompletableFuture = query.thenApply(queryResult -> {
-                            try {
-                                return preConverter.with(converterFactory).convert(queryResult
-                                        , Utils.getParameterUpperBound(0, ((ParameterizedType) serviceMethod.getReturnType())));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            return null;
-                        });
-
-                        return objectCompletableFuture;
+                        return invoke;
                     }
                 });
     }
 
     ServiceMethod loadServiceMethod(Method method) {
-        return mapperHandler.getMethodMapperList().get(method);
+        return ServiceMethod.parseAnnotations(this, method);
     }
 
 
