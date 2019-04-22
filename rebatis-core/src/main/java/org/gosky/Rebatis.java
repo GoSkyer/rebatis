@@ -25,7 +25,7 @@ public class Rebatis {
     private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
     public final ConverterFactory converterFactory;
 
-    Rebatis(Executor executor, ConverterFactory converterFactory) {
+    private Rebatis(Executor executor, ConverterFactory converterFactory) {
         this.executor = executor;
         this.converterFactory = converterFactory;
     }

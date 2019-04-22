@@ -17,6 +17,9 @@ import org.gosky.util.Utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -64,23 +67,24 @@ public class ServiceMethod<T> {
                 break;
         }
 
+        //泛型中的类型 eg: List<String>
+        Type dataContinerType = Utils.getParameterUpperBound(0, ((ParameterizedType) method.getGenericReturnType()));
+        // 获取返回值类型
         ReturnTypeEnum returnTypeEnum;
-        switch (method.getReturnType().getSimpleName()) {
-            case "void":
-                returnTypeEnum = ReturnTypeEnum.VOID;
-                break;
-            case "java.util.List":
-                returnTypeEnum = ReturnTypeEnum.LIST;
-                break;
-            case "java.util.Map":
-                returnTypeEnum = ReturnTypeEnum.MAP;
-                break;
-            default:
-                returnTypeEnum = ReturnTypeEnum.SINGLE;
-                break;
+        if (dataContinerType instanceof ParameterizedType && ((ParameterizedType) dataContinerType).getRawType().equals(List.class)) {
+            returnTypeEnum = ReturnTypeEnum.LIST;
+        } else if (dataContinerType instanceof ParameterizedType && ((ParameterizedType) dataContinerType).getRawType().equals(Map.class)) {
+            returnTypeEnum = ReturnTypeEnum.MAP;
+        } else if (dataContinerType instanceof Class && dataContinerType.equals(Void.class)) {
+            returnTypeEnum = ReturnTypeEnum.VOID;
+        } else {
+            returnTypeEnum = ReturnTypeEnum.SINGLE;
         }
+
         //构建方法SQL映射
         SqlFactory sqlFactory = SqlFactory.builder().methodName(method.getName())
+                .returnType(method.getGenericReturnType())
+                .responseType(dataContinerType)
                 .returnType(method.getGenericReturnType())
                 .returnTypeEnum(returnTypeEnum)
                 .parameterTypes(method.getParameterTypes())
@@ -96,8 +100,8 @@ public class ServiceMethod<T> {
 
         return query.thenApply(queryResult -> {
             try {
-                return ConverterUtil.with(converterFactory).convert(queryResult
-                        , Utils.getParameterUpperBound(0, ((ParameterizedType) sqlFactory.getReturnType())));
+                return ConverterUtil.with(converterFactory).convert(queryResult, sqlFactory.getReturnTypeEnum()
+                        , sqlFactory.getResponseType());
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -22,6 +22,8 @@ public class SqlFactory {
     private String sql;
     private SQLType sqlType;
     private Type returnType;
+//    private Type adapterType;
+    private Type responseType;
     private Class<?>[] parameterTypes;
     private ReturnTypeEnum returnTypeEnum;
 }
