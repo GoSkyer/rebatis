@@ -19,11 +19,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @Auther: guozhong
  * @Date: 2019-04-14 23:19
  * @Description:
  */
+
+@Slf4j
 public class ConverterUtil {
     private ConverterFactory converterFactory;
     private static ConverterUtil singleton;
@@ -52,40 +56,18 @@ public class ConverterUtil {
             return null;
         }
 
-
         if (returnTypeEnum == ReturnTypeEnum.SINGLE) {
-
+            return queryResultToObject(qr, (Class) type);
         } else if (returnTypeEnum == ReturnTypeEnum.VOID) {
 
         } else if (returnTypeEnum == ReturnTypeEnum.LIST) {
-            queryResultToListObject(qr, type);
+            return queryResultToListObject(qr, type);
         } else if (returnTypeEnum == ReturnTypeEnum.MAP) {
-
+            return queryResultToMap(qr);
         } else {
             //异常
         }
 
-//        if (type instanceof ParameterizedType) {
-//            //list or map model
-//            Type dataContinerType = ((ParameterizedType) type).getRawType();
-//            if (dataContinerType.equals(List.class)) {
-//                Type dataType = ((ParameterizedType) type).getActualTypeArguments()[0];
-//                if (dataType instanceof Class) {
-//                    List list = new ArrayList();
-//                    for (RowData row : qr.getRows()) {
-//                        list.add(getObject(dataType, rows));
-//                    }
-//                    return list;
-//                } else {
-//                    throw new UnsupportTypeException(String.format("not support type : %s", dataContinerType));
-//                }
-//            } else if (dataContinerType.equals(Map.class)) {
-//            } else {
-//                throw new UnsupportTypeException(String.format("not support type : %s", dataContinerType));
-//            }
-//        } else if (type instanceof Class) {
-//            return getObject(type, rows);
-//        }
         return null;
     }
 
@@ -112,8 +94,13 @@ public class ConverterUtil {
 
 
     public <T> List<T> queryResultToListObject(QueryResult queryResult, Type type) throws Exception {
-
-        Type dataType = ((ParameterizedType) type).getActualTypeArguments()[0];
+        Type dataType;
+        if (type instanceof ParameterizedType) {
+            dataType = ((ParameterizedType) type).getActualTypeArguments()[0];
+        } else {
+            throw new IllegalStateException(type + " return type must be parameterized"
+                    + " as " + type + "<Foo> or " + type + "<? extends Foo>");
+        }
 
         final ResultSet rows = queryResult.getRows();
         List<String> columnNames = rows.columnNames();
@@ -122,6 +109,34 @@ public class ConverterUtil {
             list.add(rowDataToObject(row, (Class) dataType, columnNames));
         }
         return list;
+    }
+
+    public <T> T queryResultToObject(QueryResult queryResult, Class<T> clazz) {
+        final ResultSet rows = queryResult.getRows();
+        List<String> columnNames = rows.columnNames();
+        Iterator<RowData> iterator = rows.iterator();
+        if (iterator.hasNext()) {
+            try {
+                return rowDataToObject(iterator.next(), clazz, columnNames);
+            } catch (Exception e) {
+                log.error("convert object error :{}", e);
+            }
+        }
+        return null;
+    }
+
+    public Map<String, Object> queryResultToMap(QueryResult queryResult) {
+        final ResultSet rows = queryResult.getRows();
+        List<String> columnNames = rows.columnNames();
+        Iterator<RowData> iterator = rows.iterator();
+        if (iterator.hasNext()) {
+            try {
+                return rowDataToMap(iterator.next(), columnNames);
+            } catch (Exception e) {
+                log.error("convert object error :{}", e);
+            }
+        }
+        return null;
     }
 
 
@@ -156,5 +171,18 @@ public class ConverterUtil {
             f.set(t, rowData.get(f.getName()));
         }
         return t;
+    }
+
+
+    public static Map<String, Object> rowDataToMap(RowData rowData, List<String> columnNames) {
+        Map<String, Object> res = new HashMap<>();
+        Iterator<Object> iterable = rowData.iterator();
+        int index = 0;
+        while (iterable.hasNext()) {
+            Object item = iterable.next();
+            res.put(columnNames.get(index), item);
+            index++;
+        }
+        return res;
     }
 }

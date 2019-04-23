@@ -71,9 +71,11 @@ public class ServiceMethod<T> {
         Type dataContinerType = Utils.getParameterUpperBound(0, ((ParameterizedType) method.getGenericReturnType()));
         // 获取返回值类型
         ReturnTypeEnum returnTypeEnum;
-        if (dataContinerType instanceof ParameterizedType && ((ParameterizedType) dataContinerType).getRawType().equals(List.class)) {
+        if (dataContinerType.equals(List.class) ||
+                (dataContinerType instanceof ParameterizedType && ((ParameterizedType) dataContinerType).getRawType().equals(List.class))) {
             returnTypeEnum = ReturnTypeEnum.LIST;
-        } else if (dataContinerType instanceof ParameterizedType && ((ParameterizedType) dataContinerType).getRawType().equals(Map.class)) {
+        } else if (dataContinerType.equals(Map.class) ||
+                (dataContinerType instanceof ParameterizedType && ((ParameterizedType) dataContinerType).getRawType().equals(Map.class))) {
             returnTypeEnum = ReturnTypeEnum.MAP;
         } else if (dataContinerType instanceof Class && dataContinerType.equals(Void.class)) {
             returnTypeEnum = ReturnTypeEnum.VOID;
