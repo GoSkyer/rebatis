@@ -7,3 +7,6 @@
 *.iml
 out
 gen
+rebatis-core/target/
+rebatis-processor/target/
+rebatis-samples/target/
