@@ -58,7 +58,7 @@ public class ConverterUtil {
         } else if (returnTypeEnum == ReturnTypeEnum.VOID) {
 
         } else if (returnTypeEnum == ReturnTypeEnum.LIST) {
-            return queryResultToListObject(qr, type);
+            queryResultToListObject(qr, type);
         } else if (returnTypeEnum == ReturnTypeEnum.MAP) {
 
         } else {
