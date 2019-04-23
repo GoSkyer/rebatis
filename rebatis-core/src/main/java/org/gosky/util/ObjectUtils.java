@@ -31,9 +31,4 @@ public final class ObjectUtils {
         return true;
     }
 
-    public static void main(String[] args) {
-        User user = new User();
-        user.setUsername("hello");
-        checkObjAllFieldsIsNull(user);
-    }
 }

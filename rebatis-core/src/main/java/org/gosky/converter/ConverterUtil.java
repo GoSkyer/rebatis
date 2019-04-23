@@ -5,8 +5,6 @@ import com.github.jasync.sql.db.ResultSet;
 import com.github.jasync.sql.db.RowData;
 
 import org.gosky.common.ReturnTypeEnum;
-import org.gosky.exception.ParseException;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -71,26 +69,26 @@ public class ConverterUtil {
         return null;
     }
 
-    @Nullable
-    private Object getObject(Type type, ResultSet rows) throws Exception {
-        if (type.equals(Map.class)) {
-            Map map = new HashMap();
-            for (String columnName : rows.columnNames()) {
-                map.put(columnName, rows.get(0).get(columnName));
-            }
-            return map;
-        }
-        Class primary = (Class) type;
-        if (primary.equals(Void.class)) {
-            return null;
-        } else if (Stream.of(((Class) type).getAnnotations()).map(Annotation::annotationType)
-                .filter(aClass -> aClass.equals(Entity.class)).toArray().length > 0) {
-            return converterFactory.convert(rows.get(0), primary);
-        } else {
-
-            return rowDataToObject(rows.get(0), primary, rows.columnNames());
-        }
-    }
+//    @Nullable
+//    private Object getObject(Type type, ResultSet rows) throws Exception {
+//        if (type.equals(Map.class)) {
+//            Map map = new HashMap();
+//            for (String columnName : rows.columnNames()) {
+//                map.put(columnName, rows.get(0).get(columnName));
+//            }
+//            return map;
+//        }
+//        Class primary = (Class) type;
+//        if (primary.equals(Void.class)) {
+//            return null;
+//        } else if (Stream.of(((Class) type).getAnnotations()).map(Annotation::annotationType)
+//                .filter(aClass -> aClass.equals(Entity.class)).toArray().length > 0) {
+//            return converterFactory.convert(rows.get(0), primary);
+//        } else {
+//
+//            return rowDataToObject(rows.get(0), primary, rows.columnNames());
+//        }
+//    }
 
 
     public <T> List<T> queryResultToListObject(QueryResult queryResult, Type type) throws Exception {
@@ -149,7 +147,7 @@ public class ConverterUtil {
             if (item == null) {
                 return null;
             } else if (!clazz.equals(item.getClass())) {
-                throw new ParseException(String.format("data type you want convert is %s ,but database return type is %s ,just change it", clazz, item.getClass()));
+                throw new IllegalStateException(String.format("data type you want convert is %s ,but database return type is %s ,just change it", clazz, item.getClass()));
             } else {
                 return (T) item;
             }

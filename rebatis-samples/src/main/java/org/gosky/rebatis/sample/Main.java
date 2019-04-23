@@ -46,10 +46,15 @@ public class Main {
 //                .converterFactory()
                 .build();
 
-        rebatis.create(TestMapper.class).test()
+        TestMapper testMapper = rebatis.create(TestMapper.class);
+        testMapper.test()
                 .thenAccept(queryResult -> {
                     System.out.println("queryResult : " + queryResult.toString());
                 });
+
+        testMapper.insert().thenAccept(aVoid -> {
+            System.out.println("success");
+        });
 
         while (true) {
 

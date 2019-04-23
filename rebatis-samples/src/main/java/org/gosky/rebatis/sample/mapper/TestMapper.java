@@ -1,5 +1,6 @@
 package org.gosky.rebatis.sample.mapper;
 
+import org.gosky.annotations.Insert;
 import org.gosky.annotations.Mapper;
 import org.gosky.annotations.Select;
 
@@ -17,4 +18,8 @@ public interface TestMapper {
 
     @Select("select id from user")
     CompletableFuture<List<Integer>> test();
+
+    @Insert("INSERT INTO user (username, password) VALUES ('test3', '12321233')")
+    CompletableFuture<Void> insert();
+
 }
