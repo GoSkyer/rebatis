@@ -1,6 +1,7 @@
 package org.gosky.rebatis.sample;
 
-import org.gosky.converter.Entity;
+
+import javax.persistence.Entity;
 
 /**
  * @Auther: guozhong

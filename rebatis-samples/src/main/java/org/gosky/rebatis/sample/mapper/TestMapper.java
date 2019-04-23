@@ -3,6 +3,7 @@ package org.gosky.rebatis.sample.mapper;
 import org.gosky.annotations.Insert;
 import org.gosky.annotations.Mapper;
 import org.gosky.annotations.Select;
+import org.gosky.rebatis.sample.User;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -16,8 +17,8 @@ import java.util.concurrent.CompletableFuture;
 @Mapper
 public interface TestMapper {
 
-    @Select("select id from user")
-    CompletableFuture<List<Integer>> test();
+    @Select("select * from user")
+    CompletableFuture<List<User>> test();
 
     @Insert("INSERT INTO user (username, password) VALUES ('test3', '12321233')")
     CompletableFuture<Void> insert();

@@ -12,7 +12,6 @@ import com.squareup.javapoet.TypeSpec;
 
 import org.gosky.converter.Converter;
 import org.gosky.converter.ConverterFactory;
-import org.gosky.converter.Entity;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -32,6 +31,7 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import javax.persistence.Entity;
 
 @AutoService(Processor.class)
 public class CoreProcessor extends AbstractProcessor {
