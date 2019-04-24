@@ -6,11 +6,13 @@ import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder;
 import com.github.jasync.sql.db.pool.ConnectionPool;
 
 import org.gosky.Rebatis;
+import org.gosky.adapter.Callback;
 import org.gosky.rebatis.apt.RebatisConverterFactory;
 import org.gosky.rebatis.sample.mapper.TestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import kotlin.Unit;
@@ -47,14 +49,21 @@ public class Main {
                 .build();
 
         TestMapper testMapper = rebatis.create(TestMapper.class);
+
         testMapper.test()
-                .thenAccept(queryResult -> {
-                    System.out.println("queryResult : " + queryResult.toString());
+                .enqueue(new Callback<List<User>>() {
+                    @Override
+                    public void onResponse(List<User> response) {
+                        System.out.println(response);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        t.printStackTrace();
+                    }
                 });
 
-        testMapper.insert().thenAccept(aVoid -> {
-            System.out.println("success");
-        });
+
 
         while (true) {
 

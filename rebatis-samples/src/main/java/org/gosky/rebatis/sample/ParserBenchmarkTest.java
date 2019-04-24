@@ -41,25 +41,7 @@ public class ParserBenchmarkTest {
         rebatisConverterFactory.init();
 
         Rebatis rebatis = new Rebatis.Builder().connectionPool(connectionPool).build();
-        rebatis.create(TestMapper.class).test()
-                .thenAccept(queryResult -> {
-//                    long l = System.currentTimeMillis();
-//                    System.out.println("start ---->");
-//                    for (int i = 0; i < 1000 * 1000; i++) {
-//                        User user = (User) rebatisConverterFactory.convert(queryResult.getRows().get(0), User.class);
-//
-//                    }
-//                    System.out.println("end ---->" + (System.currentTimeMillis() - l));
-//
-//
-//                    long l2 = System.currentTimeMillis();
-//                    System.out.println("start ---->");
-//                    for (int i = 0; i < 1000 * 1000; i++) {
-//                        User user = ResultSetMapper.parseResultSet(queryResult, User.class);
-//                    }
-//                    System.out.println("end ---->" + (System.currentTimeMillis() - l2));
-//
-                });
+        rebatis.create(TestMapper.class).test();
 
         while (true) {
 

@@ -49,7 +49,7 @@ public class ConverterUtil {
     }
 
 
-    public Object convert(QueryResult qr, ReturnTypeEnum returnTypeEnum, Type type) throws Exception {
+    public Object convert(QueryResult qr, ReturnTypeEnum returnTypeEnum, Type type) {
         ResultSet rows = qr.getRows();
         int size = rows.size();
         if (size == 0) {
@@ -71,29 +71,7 @@ public class ConverterUtil {
         return null;
     }
 
-//    @Nullable
-//    private Object getObject(Type type, ResultSet rows) throws Exception {
-//        if (type.equals(Map.class)) {
-//            Map map = new HashMap();
-//            for (String columnName : rows.columnNames()) {
-//                map.put(columnName, rows.get(0).get(columnName));
-//            }
-//            return map;
-//        }
-//        Class primary = (Class) type;
-//        if (primary.equals(Void.class)) {
-//            return null;
-//        } else if (Stream.of(((Class) type).getAnnotations()).map(Annotation::annotationType)
-//                .filter(aClass -> aClass.equals(Entity.class)).toArray().length > 0) {
-//            return converterFactory.convert(rows.get(0), primary);
-//        } else {
-//
-//            return rowDataToObject(rows.get(0), primary, rows.columnNames());
-//        }
-//    }
-
-
-    public <T> List<T> queryResultToListObject(QueryResult queryResult, Type type) throws Exception {
+    public <T> List<T> queryResultToListObject(QueryResult queryResult, Type type) {
         Type dataType;
         if (type instanceof ParameterizedType) {
             dataType = ((ParameterizedType) type).getActualTypeArguments()[0];
@@ -140,7 +118,7 @@ public class ConverterUtil {
     }
 
 
-    public <T> T rowDataToObject(RowData rowData, Class<T> clazz, List<String> columnNames) throws Exception {
+    public <T> T rowDataToObject(RowData rowData, Class<T> clazz, List<String> columnNames) {
         Iterator<Object> iterable = rowData.iterator();
         //只查一个字段或者count时，这时返回类型可能是String这种非用户自定义的类型
         // 所以这个类如果是JDK内的类，以及joda里的类（可能查了时间字段），直接返回，因为它肯定不是用户自定义的那种model
@@ -161,14 +139,25 @@ public class ConverterUtil {
             return (T) converterFactory.convert(rowData, clazz);
         }
 
-        T t = clazz.newInstance();
+        T t = null;
+        try {
+            t = clazz.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
         Field[] arrf = clazz.getDeclaredFields();
         //遍历属性
         for (Field f : arrf) {
             //设置忽略访问校验
             f.setAccessible(true);
             //为属性设置内容
-            f.set(t, rowData.get(f.getName()));
+            try {
+                f.set(t, rowData.get(f.getName()));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
         return t;
     }

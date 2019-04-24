@@ -3,6 +3,7 @@ package org.gosky.mapping;
 import com.github.jasync.sql.db.QueryResult;
 
 import org.gosky.Rebatis;
+import org.gosky.adapter.DefaultCall;
 import org.gosky.annotations.Delete;
 import org.gosky.annotations.Insert;
 import org.gosky.annotations.Select;
@@ -97,17 +98,14 @@ public class ServiceMethod<T> {
         return new ServiceMethod(sqlFactory, rebatis.executor, rebatis.converterFactory);
     }
 
-    public CompletableFuture<Object> invoke(Object[] args) {
+    public DefaultCall<Object> invoke(Object[] args) {
         CompletableFuture<QueryResult> query = executor.query(sqlFactory.getSql(), "");
 
-        return query.thenApply(queryResult -> {
-            try {
-                return ConverterUtil.with(converterFactory).convert(queryResult, sqlFactory.getReturnTypeEnum()
-                        , sqlFactory.getResponseType());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        });
+
+        return new DefaultCall(query.thenApply(queryResult -> {
+            return ConverterUtil.with(converterFactory).convert(queryResult, sqlFactory.getReturnTypeEnum()
+                    , sqlFactory.getResponseType());
+        }));
+
     }
 }
