@@ -8,6 +8,8 @@ import org.gosky.rebatis.sample.User;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+
 /**
  * @Auther: guozhong
  * @Date: 2019-03-28 18:10
@@ -18,7 +20,7 @@ import java.util.List;
 public interface TestMapper {
 
     @Select("select * from user")
-    Call<List<User>> test();
+    Observable<List<User>> test();
 
     @Insert("INSERT INTO user (username, password) VALUES ('test3', '12321233')")
     Call<Void> insert();

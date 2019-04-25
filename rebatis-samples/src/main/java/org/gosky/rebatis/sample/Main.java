@@ -6,13 +6,12 @@ import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder;
 import com.github.jasync.sql.db.pool.ConnectionPool;
 
 import org.gosky.Rebatis;
-import org.gosky.adapter.Callback;
+import org.gosky.adapter.rxjava2.RxJava2CallAdapterFactory;
 import org.gosky.rebatis.apt.RebatisConverterFactory;
 import org.gosky.rebatis.sample.mapper.TestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import kotlin.Unit;
@@ -46,23 +45,29 @@ public class Main {
         Rebatis rebatis = new Rebatis.Builder()
                 .connectionPool(connectionPool)
 //                .converterFactory()
+                .addCallAdapterFactory(new RxJava2CallAdapterFactory())
                 .build();
 
         TestMapper testMapper = rebatis.create(TestMapper.class);
 
+//        testMapper.test()
+//                .enqueue(new Callback<List<User>>() {
+//                    @Override
+//                    public void onResponse(List<User> response) {
+//                        System.out.println(response);
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Throwable t) {
+//                        t.printStackTrace();
+//                    }
+//                });
         testMapper.test()
-                .enqueue(new Callback<List<User>>() {
-                    @Override
-                    public void onResponse(List<User> response) {
-                        System.out.println(response);
-                    }
-
-                    @Override
-                    public void onFailure(Throwable t) {
-                        t.printStackTrace();
-                    }
+                .subscribe(users -> {
+                    System.out.println(users);
+                },throwable -> {
+                    throwable.printStackTrace();
                 });
-
 
 
         while (true) {

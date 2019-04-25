@@ -23,4 +23,19 @@ public class DefaultCall<T> implements Call<T> {
                     return null;
                 });
     }
+
+    @SuppressWarnings("CloneDoesntCallSuperClone") // We are a final type & this saves clearing state.
+    @Override public DefaultCall<T> clone() {
+        return new DefaultCall<>(future);
+    }
+
+    @Override
+    public void cancel() {
+        future.cancel(false);
+    }
+
+    @Override
+    public boolean isCanceled() {
+        return future.isCancelled();
+    }
 }
