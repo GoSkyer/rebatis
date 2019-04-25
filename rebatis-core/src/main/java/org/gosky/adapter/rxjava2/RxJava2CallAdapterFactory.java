@@ -40,7 +40,6 @@ public final class RxJava2CallAdapterFactory extends CallAdapter.Factory {
         Type responseType = getParameterUpperBound(0, (ParameterizedType) returnType);
 
 
-
-        return new RxJava2Adapter(responseType);
+        return new RxJava2Adapter(responseType, isFlowable, isSingle, isMaybe, isFlowable1, isSingle1, isMaybe1);
     }
 }
