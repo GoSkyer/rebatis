@@ -59,7 +59,7 @@ public final class Utils {
     return methodError(method, message + " (parameter #" + (p + 1) + ")", args);
   }
 
-  static Class<?> getRawType(Type type) {
+  public static Class<?> getRawType(Type type) {
     checkNotNull(type, "type == null");
 
     if (type instanceof Class<?>) {
@@ -298,7 +298,7 @@ public final class Utils {
     }
   }
 
-  static <T> T checkNotNull( T object, String message) {
+  public static <T> T checkNotNull(T object, String message) {
     if (object == null) {
       throw new NullPointerException(message);
     }
@@ -374,6 +374,14 @@ public final class Utils {
     String className = type == null ? "null" : type.getClass().getName();
     throw new IllegalArgumentException("Expected a Class, ParameterizedType, or "
         + "GenericArrayType, but <" + type + "> is of type " + className);
+  }
+
+  public static Type getCallResponseType(Type returnType) {
+    if (!(returnType instanceof ParameterizedType)) {
+      throw new IllegalArgumentException(
+              "Call return type must be parameterized as Call<Foo> or Call<? extends Foo>");
+    }
+    return getParameterUpperBound(0, (ParameterizedType) returnType);
   }
 
   static final class ParameterizedTypeImpl implements ParameterizedType {

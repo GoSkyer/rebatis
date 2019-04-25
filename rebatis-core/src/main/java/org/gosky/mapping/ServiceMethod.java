@@ -3,6 +3,7 @@ package org.gosky.mapping;
 import com.github.jasync.sql.db.QueryResult;
 
 import org.gosky.Rebatis;
+import org.gosky.adapter.CallAdapter;
 import org.gosky.adapter.DefaultCall;
 import org.gosky.annotations.Delete;
 import org.gosky.annotations.Insert;
@@ -33,14 +34,16 @@ public class ServiceMethod<T> {
     private SqlFactory sqlFactory;
     private Executor executor;
     private ConverterFactory converterFactory;
+    private final CallAdapter callAdapter;
 
-    public ServiceMethod(SqlFactory sqlFactory, Executor executor, ConverterFactory converterFactory) {
+    public ServiceMethod(SqlFactory sqlFactory, Executor executor, ConverterFactory converterFactory, CallAdapter callAdapter) {
         this.sqlFactory = sqlFactory;
         this.executor = executor;
         this.converterFactory = converterFactory;
+        this.callAdapter = callAdapter;
     }
 
-    public static ServiceMethod parseAnnotations(Rebatis rebatis, Method method) {
+    public static <T> ServiceMethod<T> parseAnnotations(Rebatis rebatis, Method method) {
 
         Annotation[] annotations = method.getDeclaredAnnotations();
         String simpleName = annotations[0].annotationType().getSimpleName();
@@ -95,17 +98,19 @@ public class ServiceMethod<T> {
                 .sqlType(sqlType)
                 .build();
 
-        return new ServiceMethod(sqlFactory, rebatis.executor, rebatis.converterFactory);
+        return new ServiceMethod(sqlFactory, rebatis.executor, rebatis.converterFactory,
+                rebatis.callAdapter(method.getGenericReturnType(), method.getAnnotations()));
     }
 
-    public DefaultCall<Object> invoke(Object[] args) {
-        CompletableFuture<QueryResult> query = executor.query(sqlFactory.getSql(), "");
+    public Object invoke(Object[] args) {
+        CompletableFuture<Object> future = executor.query(sqlFactory.getSql(), "").thenApply(queryResult -> convert(queryResult));
 
+        return callAdapter.adapt(new DefaultCall(future));
 
-        return new DefaultCall(query.thenApply(queryResult -> {
-            return ConverterUtil.with(converterFactory).convert(queryResult, sqlFactory.getReturnTypeEnum()
-                    , sqlFactory.getResponseType());
-        }));
+    }
 
+    private Object convert(QueryResult queryResult) {
+        return ConverterUtil.with(converterFactory).convert(queryResult, sqlFactory.getReturnTypeEnum()
+                , sqlFactory.getResponseType());
     }
 }

@@ -1,6 +1,6 @@
 package org.gosky.rebatis.sample.mapper;
 
-import org.gosky.adapter.DefaultCall;
+import org.gosky.adapter.Call;
 import org.gosky.annotations.Insert;
 import org.gosky.annotations.Mapper;
 import org.gosky.annotations.Select;
@@ -18,9 +18,9 @@ import java.util.List;
 public interface TestMapper {
 
     @Select("select * from user")
-    DefaultCall<List<User>> test();
+    Call<List<User>> test();
 
     @Insert("INSERT INTO user (username, password) VALUES ('test3', '12321233')")
-    DefaultCall<Void> insert();
+    Call<Void> insert();
 
 }

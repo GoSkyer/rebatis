@@ -2,16 +2,27 @@ package org.gosky;
 
 import com.github.jasync.sql.db.pool.ConnectionPool;
 
+import org.gosky.adapter.CallAdapter;
+import org.gosky.adapter.DefaultCallAdapterFactory;
 import org.gosky.converter.ConverterFactory;
 import org.gosky.executor.Executor;
 import org.gosky.executor.SimpleExecutor;
 import org.gosky.mapping.ServiceMethod;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.extern.slf4j.Slf4j;
+
+import static java.util.Collections.unmodifiableList;
+import static org.gosky.util.Utils.checkNotNull;
 
 
 /**
@@ -19,15 +30,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date: 2019-03-11 23:11
  * @Description:
  */
+@Slf4j
 public class Rebatis {
 
     public final Executor executor;
     private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
     public final ConverterFactory converterFactory;
+    public final List<CallAdapter.Factory> callAdapterFactories;
 
-    private Rebatis(Executor executor, ConverterFactory converterFactory) {
+
+    private Rebatis(Executor executor, ConverterFactory converterFactory, List<CallAdapter.Factory> callAdapterFactories) {
         this.executor = executor;
         this.converterFactory = converterFactory;
+        this.callAdapterFactories = callAdapterFactories;
     }
 
     @SuppressWarnings("unchecked") // Single-interface proxy creation guarded by parameter safety.
@@ -48,7 +63,7 @@ public class Rebatis {
                 });
     }
 
-    private ServiceMethod loadServiceMethod(Method method) {
+    private ServiceMethod<?> loadServiceMethod(Method method) {
         ServiceMethod<?> result = serviceMethodCache.get(method);
         if (result != null) return result;
 
@@ -63,17 +78,48 @@ public class Rebatis {
     }
 
 
+    public CallAdapter<?, ?> callAdapter(Type returnType, Annotation[] annotations) {
+        checkNotNull(returnType, "returnType == null");
+        checkNotNull(annotations, "annotations == null");
+
+        for (int i = 0, count = callAdapterFactories.size(); i < count; i++) {
+            CallAdapter<?, ?> adapter = callAdapterFactories.get(i).get(returnType, annotations);
+            if (adapter != null) {
+                return adapter;
+            }
+        }
+
+        StringBuilder builder = new StringBuilder("Could not locate call adapter for ")
+                .append(returnType)
+                .append(".\n");
+
+        builder.append("  Tried:");
+        for (int i = 0, count = callAdapterFactories.size(); i < count; i++) {
+            builder.append("\n   * ").append(callAdapterFactories.get(i).getClass().getName());
+        }
+        throw new IllegalArgumentException(builder.toString());
+    }
+
+
     public static final class Builder {
         private ConnectionPool connectionPool;
         private ConverterFactory converterFactor;
+        private final List<CallAdapter.Factory> callAdapterFactories = new ArrayList<>();
 
         public Builder connectionPool(ConnectionPool connectionPool) {
+            checkNotNull(connectionPool, "connectionPool == null");
             this.connectionPool = connectionPool;
             return this;
         }
 
         public Builder converterFactory(ConverterFactory converterFactory) {
             this.converterFactor = converterFactory;
+            return this;
+        }
+
+
+        public Builder addCallAdapterFactory(CallAdapter.Factory factory) {
+            callAdapterFactories.add(checkNotNull(factory, "factory == null"));
             return this;
         }
 
@@ -92,7 +138,12 @@ public class Rebatis {
                 }
             }
 
-            return new Rebatis(new SimpleExecutor(connectionPool), converterFactor);
+            if (callAdapterFactories.size() == 0) {
+                log.debug("callAdapterFactories size = 0, add default call");
+                callAdapterFactories.add(new DefaultCallAdapterFactory());
+            }
+
+            return new Rebatis(new SimpleExecutor(connectionPool), converterFactor, unmodifiableList(callAdapterFactories));
         }
     }
 }
