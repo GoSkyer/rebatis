@@ -35,7 +35,7 @@ public class SQLParsingHandler {
             int open = stringBuilder.indexOf("{");
             int close = stringBuilder.indexOf("}");
             stringBuilder.replace(open - 1, close + 1, "hello");
-            System.out.println(stringBuilder);
+            log.debug("sql :{}", stringBuilder);
         }
         return stringBuilder.toString();
     }
