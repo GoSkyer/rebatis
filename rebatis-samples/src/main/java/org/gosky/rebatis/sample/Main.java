@@ -62,12 +62,12 @@ public class Main {
 //                        t.printStackTrace();
 //                    }
 //                });
-        testMapper.test()
-                .subscribe(users -> {
-                    System.out.println(users);
-                },throwable -> {
-                    throwable.printStackTrace();
-                });
+//        testMapper.test("Tome", 18)
+//                .subscribe(users -> {
+//                    System.out.println(users);
+//                }, throwable -> {
+//                    throwable.printStackTrace();
+//                });
 
 
         while (true) {

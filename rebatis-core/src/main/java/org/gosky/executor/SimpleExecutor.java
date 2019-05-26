@@ -3,6 +3,7 @@ package org.gosky.executor;
 import com.github.jasync.sql.db.QueryResult;
 import com.github.jasync.sql.db.pool.ConnectionPool;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -19,8 +20,8 @@ public class SimpleExecutor implements Executor {
     }
 
     @Override
-    public CompletableFuture<QueryResult> query(String sql, Object parameter) {
-        return tConnectionPool.sendPreparedStatement(sql);
+    public CompletableFuture<QueryResult> query(String sql, List<?> values) {
+        return tConnectionPool.sendPreparedStatement(sql, values);
     }
 
 }

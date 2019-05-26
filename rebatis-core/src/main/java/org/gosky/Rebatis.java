@@ -49,15 +49,17 @@ public class Rebatis {
     public <T> T create(final Class<T> mapper) {
         return (T) Proxy.newProxyInstance(mapper.getClassLoader(), new Class<?>[]{mapper},
                 new InvocationHandler() {
+
                     private final Object[] emptyArgs = new Object[0];
 
                     @Override
-                    public Object invoke(Object proxy, Method method,
-                                         Object[] args) throws Throwable {
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
                         // If the method is a method from Object then defer to normal invocation.
                         if (method.getDeclaringClass() == Object.class) {
                             return method.invoke(this, args);
                         }
+
                         return loadServiceMethod(method).invoke(args);
                     }
                 });
@@ -94,9 +96,11 @@ public class Rebatis {
                 .append(".\n");
 
         builder.append("  Tried:");
+
         for (int i = 0, count = callAdapterFactories.size(); i < count; i++) {
             builder.append("\n   * ").append(callAdapterFactories.get(i).getClass().getName());
         }
+
         throw new IllegalArgumentException(builder.toString());
     }
 

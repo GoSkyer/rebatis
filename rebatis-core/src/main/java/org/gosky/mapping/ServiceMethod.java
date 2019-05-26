@@ -14,6 +14,8 @@ import org.gosky.common.SQLType;
 import org.gosky.converter.ConverterFactory;
 import org.gosky.converter.ConverterUtil;
 import org.gosky.executor.Executor;
+import org.gosky.parsing.ParseSqlResult;
+import org.gosky.parsing.Parser;
 import org.gosky.util.Utils;
 
 import java.lang.annotation.Annotation;
@@ -72,16 +74,17 @@ public class ServiceMethod<T> {
         }
 
         //泛型中的类型 eg: List<String>
-        Type dataContinerType = Utils.getParameterUpperBound(0, ((ParameterizedType) method.getGenericReturnType()));
+        Type dataContainerType = Utils.getParameterUpperBound(0, ((ParameterizedType) method.getGenericReturnType()));
+
         // 获取返回值类型
         ReturnTypeEnum returnTypeEnum;
-        if (dataContinerType.equals(List.class) ||
-                (dataContinerType instanceof ParameterizedType && ((ParameterizedType) dataContinerType).getRawType().equals(List.class))) {
+        if (dataContainerType.equals(List.class) ||
+                (dataContainerType instanceof ParameterizedType && ((ParameterizedType) dataContainerType).getRawType().equals(List.class))) {
             returnTypeEnum = ReturnTypeEnum.LIST;
-        } else if (dataContinerType.equals(Map.class) ||
-                (dataContinerType instanceof ParameterizedType && ((ParameterizedType) dataContinerType).getRawType().equals(Map.class))) {
+        } else if (dataContainerType.equals(Map.class) ||
+                (dataContainerType instanceof ParameterizedType && ((ParameterizedType) dataContainerType).getRawType().equals(Map.class))) {
             returnTypeEnum = ReturnTypeEnum.MAP;
-        } else if (dataContinerType instanceof Class && dataContinerType.equals(Void.class)) {
+        } else if (dataContainerType instanceof Class && dataContainerType.equals(Void.class)) {
             returnTypeEnum = ReturnTypeEnum.VOID;
         } else {
             returnTypeEnum = ReturnTypeEnum.SINGLE;
@@ -89,8 +92,9 @@ public class ServiceMethod<T> {
 
         //构建方法SQL映射
         SqlFactory sqlFactory = SqlFactory.builder().methodName(method.getName())
+                .method(method)
                 .returnType(method.getGenericReturnType())
-                .responseType(dataContinerType)
+                .responseType(dataContainerType)
                 .returnType(method.getGenericReturnType())
                 .returnTypeEnum(returnTypeEnum)
                 .parameterTypes(method.getParameterTypes())
@@ -102,8 +106,11 @@ public class ServiceMethod<T> {
                 rebatis.callAdapter(method.getGenericReturnType(), method.getAnnotations()));
     }
 
-    public Object invoke(Object[] args) {
-        CompletableFuture<Object> future = executor.query(sqlFactory.getSql(), "").thenApply(queryResult -> convert(queryResult));
+    public Object invoke(Object[] args) throws Exception {
+
+        ParseSqlResult sqlResult = Parser.parse(sqlFactory.getSql(), sqlFactory.getMethod(), args);
+
+        CompletableFuture<Object> future = executor.query(sqlResult.getSql(), sqlResult.getValues()).thenApply(queryResult -> convert(queryResult));
 
         return callAdapter.adapt(new DefaultCall(future));
 

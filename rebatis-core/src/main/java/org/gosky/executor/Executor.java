@@ -2,6 +2,7 @@ package org.gosky.executor;
 
 import com.github.jasync.sql.db.QueryResult;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -11,6 +12,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface Executor {
 
-    CompletableFuture<QueryResult> query(String sql, Object parameter);
+    CompletableFuture<QueryResult> query(String sql, List<?> values);
 
 }

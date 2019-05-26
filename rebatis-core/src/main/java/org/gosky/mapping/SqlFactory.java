@@ -3,6 +3,7 @@ package org.gosky.mapping;
 import org.gosky.common.ReturnTypeEnum;
 import org.gosky.common.SQLType;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import lombok.AllArgsConstructor;
@@ -26,4 +27,7 @@ public class SqlFactory {
     private Type responseType;
     private Class<?>[] parameterTypes;
     private ReturnTypeEnum returnTypeEnum;
+
+    //
+    private Method method;
 }
