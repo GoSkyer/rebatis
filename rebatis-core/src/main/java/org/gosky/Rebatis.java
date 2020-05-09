@@ -29,7 +29,7 @@ import static org.gosky.util.Utils.checkNotNull;
 public class Rebatis {
 
     public final Executor executor;
-    private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
+    private final Map<Method, ServiceMethod> serviceMethodCache = new ConcurrentHashMap<>();
     public final ConverterFactory converterFactory;
     public final List<CallAdapter.Factory> callAdapterFactories;
 
@@ -59,8 +59,8 @@ public class Rebatis {
                 });
     }
 
-    private ServiceMethod<?> loadServiceMethod(Method method) {
-        ServiceMethod<?> result = serviceMethodCache.get(method);
+    private ServiceMethod loadServiceMethod(Method method) {
+        ServiceMethod result = serviceMethodCache.get(method);
         if (result != null) return result;
 
         synchronized (serviceMethodCache) {

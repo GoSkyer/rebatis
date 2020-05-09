@@ -33,21 +33,21 @@ import java.util.concurrent.CompletableFuture;
  * @Date: 2019-03-28 18:17
  * @Description:
  */
-public class ServiceMethod<T> {
+public class ServiceMethod {
     private Logger logger = LoggerFactory.getLogger(ServiceMethod.class);
     private SqlFactory sqlFactory;
     private Executor executor;
     private ConverterFactory converterFactory;
-    private final CallAdapter callAdapter;
+    private final CallAdapter<?, ?> callAdapter;
 
-    public ServiceMethod(SqlFactory sqlFactory, Executor executor, ConverterFactory converterFactory, CallAdapter callAdapter) {
+    public ServiceMethod(SqlFactory sqlFactory, Executor executor, ConverterFactory converterFactory, CallAdapter<?, ?> callAdapter) {
         this.sqlFactory = sqlFactory;
         this.executor = executor;
         this.converterFactory = converterFactory;
         this.callAdapter = callAdapter;
     }
 
-    public static <T> ServiceMethod<T> parseAnnotations(Rebatis rebatis, Method method) {
+    public static ServiceMethod parseAnnotations(Rebatis rebatis, Method method) {
 
         Annotation[] annotations = method.getDeclaredAnnotations();
         String simpleName = annotations[0].annotationType().getSimpleName();
@@ -108,6 +108,12 @@ public class ServiceMethod<T> {
                 rebatis.callAdapter(method.getGenericReturnType(), method.getAnnotations()));
     }
 
+    /**
+     * 解析sql并执行
+     * @param args service方法中的参数
+     * @return
+     * @throws Exception
+     */
     public Object invoke(Object[] args) throws Exception {
 
         ParseSqlResult sqlResult = Parser.parse(sqlFactory.getSql(), sqlFactory.getMethod(), args);
