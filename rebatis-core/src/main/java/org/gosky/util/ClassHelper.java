@@ -1,7 +1,7 @@
 package org.gosky.util;
 
 
-import org.gosky.annotations.Mapper;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;

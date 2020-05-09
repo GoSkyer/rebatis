@@ -1,5 +1,6 @@
 package org.gosky;
 
+import com.github.jasync.sql.db.mysql.MySQLConnection;
 import com.github.jasync.sql.db.pool.ConnectionPool;
 
 import org.gosky.adapter.CallAdapter;
@@ -24,12 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import static java.util.Collections.unmodifiableList;
 import static org.gosky.util.Utils.checkNotNull;
 
-
-/**
- * @Auther: guozhong
- * @Date: 2019-03-11 23:11
- * @Description:
- */
 @Slf4j
 public class Rebatis {
 
@@ -37,7 +32,6 @@ public class Rebatis {
     private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
     public final ConverterFactory converterFactory;
     public final List<CallAdapter.Factory> callAdapterFactories;
-
 
     private Rebatis(Executor executor, ConverterFactory converterFactory, List<CallAdapter.Factory> callAdapterFactories) {
         this.executor = executor;
@@ -84,8 +78,8 @@ public class Rebatis {
         checkNotNull(returnType, "returnType == null");
         checkNotNull(annotations, "annotations == null");
 
-        for (int i = 0, count = callAdapterFactories.size(); i < count; i++) {
-            CallAdapter<?, ?> adapter = callAdapterFactories.get(i).get(returnType, annotations);
+        for (CallAdapter.Factory callAdapterFactory : callAdapterFactories) {
+            CallAdapter<?, ?> adapter = callAdapterFactory.get(returnType, annotations);
             if (adapter != null) {
                 return adapter;
             }
@@ -97,8 +91,8 @@ public class Rebatis {
 
         builder.append("  Tried:");
 
-        for (int i = 0, count = callAdapterFactories.size(); i < count; i++) {
-            builder.append("\n   * ").append(callAdapterFactories.get(i).getClass().getName());
+        for (CallAdapter.Factory callAdapterFactory : callAdapterFactories) {
+            builder.append("\n   * ").append(callAdapterFactory.getClass().getName());
         }
 
         throw new IllegalArgumentException(builder.toString());
@@ -106,11 +100,11 @@ public class Rebatis {
 
 
     public static final class Builder {
-        private ConnectionPool connectionPool;
+        private ConnectionPool<MySQLConnection> connectionPool;
         private ConverterFactory converterFactor;
         private final List<CallAdapter.Factory> callAdapterFactories = new ArrayList<>();
 
-        public Builder connectionPool(ConnectionPool connectionPool) {
+        public Builder connectionPool(ConnectionPool<MySQLConnection> connectionPool) {
             checkNotNull(connectionPool, "connectionPool == null");
             this.connectionPool = connectionPool;
             return this;

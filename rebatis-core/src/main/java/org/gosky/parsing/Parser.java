@@ -1,22 +1,18 @@
 package org.gosky.parsing;
 
-import org.gosky.annotations.Param;
+import org.apache.ibatis.annotations.Param;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 
 /**
- * @description: TODO
  * @author: Galaxy
  * @date: 2019-05-26 15:10
  **/
 public class Parser {
 
     private static Parser INSTANCE = new Parser();
-
-    @Deprecated
-    private Map<Object, Object> sqlCacheMap = new HashMap<>();
 
     public static ParseSqlResult parse(String sqlBeforeParse, Method method, Object[] args) throws Exception {
 
@@ -104,10 +100,5 @@ public class Parser {
 
         return list;
     }
-
-    public static void main(String[] args) throws Exception {
-        String sql = "select * from user where name = #{name} and age = #{age} and name = #{name}";
-    }
-
 
 }

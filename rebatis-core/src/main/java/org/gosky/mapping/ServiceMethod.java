@@ -5,10 +5,10 @@ import com.github.jasync.sql.db.QueryResult;
 import org.gosky.Rebatis;
 import org.gosky.adapter.CallAdapter;
 import org.gosky.adapter.DefaultCall;
-import org.gosky.annotations.Delete;
-import org.gosky.annotations.Insert;
-import org.gosky.annotations.Select;
-import org.gosky.annotations.Update;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.gosky.common.ReturnTypeEnum;
 import org.gosky.common.SQLType;
 import org.gosky.converter.ConverterFactory;
@@ -17,6 +17,8 @@ import org.gosky.executor.Executor;
 import org.gosky.parsing.ParseSqlResult;
 import org.gosky.parsing.Parser;
 import org.gosky.util.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -32,7 +34,7 @@ import java.util.concurrent.CompletableFuture;
  * @Description:
  */
 public class ServiceMethod<T> {
-
+    private Logger logger = LoggerFactory.getLogger(ServiceMethod.class);
     private SqlFactory sqlFactory;
     private Executor executor;
     private ConverterFactory converterFactory;
@@ -109,7 +111,7 @@ public class ServiceMethod<T> {
     public Object invoke(Object[] args) throws Exception {
 
         ParseSqlResult sqlResult = Parser.parse(sqlFactory.getSql(), sqlFactory.getMethod(), args);
-
+        logger.info("run sql={}, params={}", sqlResult.getSql(), sqlResult.getValues());
         CompletableFuture<Object> future = executor.query(sqlResult.getSql(), sqlResult.getValues()).thenApply(queryResult -> convert(queryResult));
 
         return callAdapter.adapt(new DefaultCall(future));

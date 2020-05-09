@@ -1,10 +1,10 @@
 package org.gosky.rebatis.sample.mapper;
 
 import org.gosky.adapter.Call;
-import org.gosky.annotations.Insert;
-import org.gosky.annotations.Mapper;
-import org.gosky.annotations.Param;
-import org.gosky.annotations.Select;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.gosky.rebatis.sample.User;
 
 import java.util.List;

@@ -1,8 +1,8 @@
 package org.gosky.mapping;
 
-import org.gosky.annotations.Mapper;
-import org.gosky.annotations.Select;
-import org.gosky.annotations.Update;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 import java.util.Map;

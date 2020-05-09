@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.github.jasync-sql</groupId>
             <artifactId>jasync-mysql</artifactId>
-            <version>0.9.51</version>
+            <version>1.0.17</version>
         </dependency>
 
         <dependency>

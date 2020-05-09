@@ -3,20 +3,19 @@ package org.gosky.parsing;
 import java.util.List;
 
 /**
- * @description: TODO
  * @author: Galaxy
  * @date: 2019-05-26 22:08
  **/
 public class ParseSqlResult {
 
     private String sql;
-    private List values;
+    private List<Object> values;
 
     public ParseSqlResult(String sql) {
         this.sql = sql;
     }
 
-    public ParseSqlResult(String sql, List values) {
+    public ParseSqlResult(String sql, List<Object> values) {
         this.sql = sql;
         this.values = values;
     }
@@ -29,11 +28,11 @@ public class ParseSqlResult {
         this.sql = sql;
     }
 
-    public List getValues() {
+    public List<Object> getValues() {
         return values;
     }
 
-    public void setValues(List values) {
+    public void setValues(List<Object> values) {
         this.values = values;
     }
 
