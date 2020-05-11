@@ -1,9 +1,18 @@
 package org.gosky.parsing;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.reflection.DefaultReflectorFactory;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.ReflectorFactory;
+import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
+import org.apache.ibatis.reflection.factory.ObjectFactory;
+import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
+import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -11,6 +20,70 @@ import java.util.*;
  * @date: 2019-05-26 15:10
  **/
 public class Parser {
+
+    protected ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
+    protected ObjectFactory objectFactory = new DefaultObjectFactory();
+    protected ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory();
+
+    private List<Class<?>> typeList = new ArrayList<Class<?>>() {{
+        add(String.class);
+
+        add(Byte.class);
+        add(Long.class);
+        add(Short.class);
+        add(Integer.class);
+        add(Integer.class);
+        add(Double.class);
+        add(Float.class);
+        add(Boolean.class);
+
+        add(Byte[].class);
+        add(Long[].class);
+        add(Short[].class);
+        add(Integer[].class);
+        add(Integer[].class);
+        add(Double[].class);
+        add(Float[].class);
+        add(Boolean[].class);
+
+        add(byte.class);
+        add(long.class);
+        add(short.class);
+        add(int.class);
+        add(int.class);
+        add(double.class);
+        add(float.class);
+        add(boolean.class);
+
+        add(byte[].class);
+        add(long[].class);
+        add(short[].class);
+        add(int[].class);
+        add(int[].class);
+        add(double[].class);
+        add(float[].class);
+        add(boolean[].class);
+
+        add(Date.class);
+        add(BigDecimal.class);
+        add(BigDecimal.class);
+        add(BigInteger.class);
+        add(Object.class);
+
+        add(Date[].class);
+        add(BigDecimal[].class);
+        add(BigDecimal[].class);
+        add(BigInteger[].class);
+        add(Object[].class);
+
+//        add(Map.class);
+//        add(HashMap.class);
+        add(List.class);
+        add(ArrayList.class);
+        add(Collection.class);
+        add(Iterator.class);
+    }};
+
 
     private static Parser INSTANCE = new Parser();
 
@@ -53,7 +126,14 @@ public class Parser {
         for (String range : rangeList) {
             if (parameterMappings instanceof Map) {
                 Object e = ((Map) parameterMappings).get(range);
-                values.add(e);
+                if (typeList.contains(e)) {
+                    values.add(e);
+                } else {
+                    //说明是pojo
+                    MetaObject.forObject(e, objectFactory, objectWrapperFactory, reflectorFactory).getValue()
+                }
+            } else {
+                values.add(parameterMappings);
             }
         }
 
