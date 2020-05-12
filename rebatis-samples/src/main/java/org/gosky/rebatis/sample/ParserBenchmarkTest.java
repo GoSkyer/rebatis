@@ -38,7 +38,7 @@ public class ParserBenchmarkTest {
         });
 
         Rebatis rebatis = new Rebatis.Builder().connectionPool(connectionPool).build();
-        rebatis.create(TestMapper.class).test(18, "Tom").subscribe(System.out::println);
+//        rebatis.create(TestMapper.class).test(18, "Tom").subscribe(System.out::println);
 
         while (true) {
 

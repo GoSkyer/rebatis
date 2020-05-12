@@ -104,37 +104,33 @@ public class Parser {
 //        List<ParameterRange> rangeList = paramInSqlPosition(sqlBeforeParse);
         //解析方法参数
         ParamNameResolver paramNameResolver = new ParamNameResolver(method);
-        Object parameterMappings = paramNameResolver.getNamedParams(args);
+        Object parameter = paramNameResolver.getNamedParams(args);
+        //parameterMappings 如果多参数那么是个map,如果单参数且不是list/array 就是原对象
 
-        return replaceSqlWithParameters(sqlBeforeParse, parameterMappings);
+        return replaceSqlWithParameters(sqlBeforeParse, parameter);
 
     }
 
-    private ParseSqlResult replaceSqlWithParameters(String sqlBeforeParse, Object parameterMappings) {
+    private ParseSqlResult replaceSqlWithParameters(String sqlBeforeParse, Object parameter) {
         List<String> rangeList = new ArrayList<>();
-        GenericTokenParser parser = new GenericTokenParser("#{", "}", new TokenHandler() {
-            @Override
-            public String handleToken(String content) {
-                rangeList.add(content);
-                return "?";
-            }
+        GenericTokenParser parser = new GenericTokenParser("#{", "}", content -> {
+            rangeList.add(content);
+            return "?";
         });
 
         String sqlAfterParse = parser.parse(sqlBeforeParse);
         List<Object> values = new LinkedList<>();
 
         for (String range : rangeList) {
-            if (parameterMappings instanceof Map) {
-                Object e = ((Map) parameterMappings).get(range);
-                if (typeList.contains(e)) {
-                    values.add(e);
-                } else {
-                    //说明是pojo
-                    MetaObject.forObject(e, objectFactory, objectWrapperFactory, reflectorFactory).getValue()
-                }
+            if (typeList.contains(parameter.getClass())){
+                //单参数java基础类型
+                values.add(parameter);
             } else {
-                values.add(parameterMappings);
+                //pojo或者map
+                Object value = MetaObject.forObject(parameter, objectFactory, objectWrapperFactory, reflectorFactory).getValue(range);
+                values.add(value);
             }
+
         }
 
         return new ParseSqlResult(sqlAfterParse, values);
