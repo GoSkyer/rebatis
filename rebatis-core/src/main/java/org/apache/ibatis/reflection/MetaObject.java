@@ -28,16 +28,14 @@ public class MetaObject {
 
 //  private final Object originalObject;
   private final ObjectWrapper objectWrapper;
-//  private final ObjectFactory objectFactory;
-  private final ObjectWrapperFactory objectWrapperFactory;
-  private final ReflectorFactory reflectorFactory;
+  private final ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
 
-  private MetaObject(Object object, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
+  private MetaObject(Object object ) {
 //    this.originalObject = object;
 //    this.objectFactory = objectFactory;
-    this.objectWrapperFactory = objectWrapperFactory;
-    this.reflectorFactory = reflectorFactory;
 
+    //  private final ObjectFactory objectFactory;
+    ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory();
     if (object instanceof ObjectWrapper) {
       this.objectWrapper = (ObjectWrapper) object;
     } else if (objectWrapperFactory.hasWrapperFor(object)) {
@@ -52,11 +50,11 @@ public class MetaObject {
   }
 
 
-  public static MetaObject forObject(Object object, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
+  public static MetaObject forObject(Object object) {
     if (object == null) {
       return SystemMetaObject.NULL_META_OBJECT;
     } else {
-      return new MetaObject(object, objectWrapperFactory, reflectorFactory);
+      return new MetaObject(object);
     }
   }
 
@@ -89,21 +87,21 @@ public class MetaObject {
 //    return objectWrapper.getSetterNames();
 //  }
 
-  public Class<?> getSetterType(String name) {
-    return objectWrapper.getSetterType(name);
-  }
+//  public Class<?> getSetterType(String name) {
+//    return objectWrapper.getSetterType(name);
+//  }
+//
+//  public Class<?> getGetterType(String name) {
+//    return objectWrapper.getGetterType(name);
+//  }
 
-  public Class<?> getGetterType(String name) {
-    return objectWrapper.getGetterType(name);
-  }
+//  public boolean hasSetter(String name) {
+//    return objectWrapper.hasSetter(name);
+//  }
 
-  public boolean hasSetter(String name) {
-    return objectWrapper.hasSetter(name);
-  }
-
-  public boolean hasGetter(String name) {
-    return objectWrapper.hasGetter(name);
-  }
+//  public boolean hasGetter(String name) {
+//    return objectWrapper.hasGetter(name);
+//  }
 
   public Object getValue(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
@@ -139,7 +137,7 @@ public class MetaObject {
 
   public MetaObject metaObjectForProperty(String name) {
     Object value = getValue(name);
-    return MetaObject.forObject(value, objectWrapperFactory, reflectorFactory);
+    return MetaObject.forObject(value);
   }
 
 //  public ObjectWrapper getObjectWrapper() {

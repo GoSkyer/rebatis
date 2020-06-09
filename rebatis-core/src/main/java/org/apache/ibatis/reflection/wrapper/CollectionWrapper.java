@@ -56,25 +56,25 @@ public class CollectionWrapper implements ObjectWrapper {
 //    throw new UnsupportedOperationException();
 //  }
 
-  @Override
-  public Class<?> getSetterType(String name) {
-    throw new UnsupportedOperationException();
-  }
+//  @Override
+//  public Class<?> getSetterType(String name) {
+//    throw new UnsupportedOperationException();
+//  }
+//
+//  @Override
+//  public Class<?> getGetterType(String name) {
+//    throw new UnsupportedOperationException();
+//  }
 
-  @Override
-  public Class<?> getGetterType(String name) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean hasSetter(String name) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean hasGetter(String name) {
-    throw new UnsupportedOperationException();
-  }
+//  @Override
+//  public boolean hasSetter(String name) {
+//    throw new UnsupportedOperationException();
+//  }
+//
+//  @Override
+//  public boolean hasGetter(String name) {
+//    throw new UnsupportedOperationException();
+//  }
 
 //  @Override
 //  public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {

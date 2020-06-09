@@ -68,67 +68,67 @@ public class MapWrapper extends BaseWrapper {
 //    return map.keySet().toArray(new String[map.keySet().size()]);
 //  }
 
-  @Override
-  public Class<?> getSetterType(String name) {
-    PropertyTokenizer prop = new PropertyTokenizer(name);
-    if (prop.hasNext()) {
-      MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
-      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
-        return Object.class;
-      } else {
-        return metaValue.getSetterType(prop.getChildren());
-      }
-    } else {
-      if (map.get(name) != null) {
-        return map.get(name).getClass();
-      } else {
-        return Object.class;
-      }
-    }
-  }
+//  @Override
+//  public Class<?> getSetterType(String name) {
+//    PropertyTokenizer prop = new PropertyTokenizer(name);
+//    if (prop.hasNext()) {
+//      MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
+//      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
+//        return Object.class;
+//      } else {
+//        return metaValue.getSetterType(prop.getChildren());
+//      }
+//    } else {
+//      if (map.get(name) != null) {
+//        return map.get(name).getClass();
+//      } else {
+//        return Object.class;
+//      }
+//    }
+//  }
+//
+//  @Override
+//  public Class<?> getGetterType(String name) {
+//    PropertyTokenizer prop = new PropertyTokenizer(name);
+//    if (prop.hasNext()) {
+//      MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
+//      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
+//        return Object.class;
+//      } else {
+//        return metaValue.getGetterType(prop.getChildren());
+//      }
+//    } else {
+//      if (map.get(name) != null) {
+//        return map.get(name).getClass();
+//      } else {
+//        return Object.class;
+//      }
+//    }
+//  }
 
-  @Override
-  public Class<?> getGetterType(String name) {
-    PropertyTokenizer prop = new PropertyTokenizer(name);
-    if (prop.hasNext()) {
-      MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
-      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
-        return Object.class;
-      } else {
-        return metaValue.getGetterType(prop.getChildren());
-      }
-    } else {
-      if (map.get(name) != null) {
-        return map.get(name).getClass();
-      } else {
-        return Object.class;
-      }
-    }
-  }
+//  @Override
+//  public boolean hasSetter(String name) {
+//    return true;
+//  }
 
-  @Override
-  public boolean hasSetter(String name) {
-    return true;
-  }
-
-  @Override
-  public boolean hasGetter(String name) {
-    PropertyTokenizer prop = new PropertyTokenizer(name);
-    if (prop.hasNext()) {
-      if (map.containsKey(prop.getIndexedName())) {
-        MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
-        if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
-          return true;
-        } else {
-          return metaValue.hasGetter(prop.getChildren());
-        }
-      } else {
-        return false;
-      }
-    } else {
-      return map.containsKey(prop.getName());
-    }
-  }
+//  @Override
+//  public boolean hasGetter(String name) {
+//    PropertyTokenizer prop = new PropertyTokenizer(name);
+//    if (prop.hasNext()) {
+//      if (map.containsKey(prop.getIndexedName())) {
+//        MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
+//        if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
+//          return true;
+//        } else {
+//          return metaValue.hasGetter(prop.getChildren());
+//        }
+//      } else {
+//        return false;
+//      }
+//    } else {
+//      return map.containsKey(prop.getName());
+//    }
+//  }
 
 //  @Override
 //  public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {

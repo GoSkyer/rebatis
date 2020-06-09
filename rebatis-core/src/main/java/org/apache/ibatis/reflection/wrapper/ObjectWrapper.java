@@ -32,13 +32,13 @@ public interface ObjectWrapper {
 //
 //  String[] getSetterNames();
 
-  Class<?> getSetterType(String name);
+//  Class<?> getSetterType(String name);
+//
+//  Class<?> getGetterType(String name);
 
-  Class<?> getGetterType(String name);
+//  boolean hasSetter(String name);
 
-  boolean hasSetter(String name);
-
-  boolean hasGetter(String name);
+//  boolean hasGetter(String name);
 
 //  MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory);
 

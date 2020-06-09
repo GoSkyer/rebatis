@@ -68,73 +68,73 @@ public class BeanWrapper extends BaseWrapper {
 //    return metaClass.getSetterNames();
 //  }
 
-  @Override
-  public Class<?> getSetterType(String name) {
-    PropertyTokenizer prop = new PropertyTokenizer(name);
-    if (prop.hasNext()) {
-      MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
-      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
-        return metaClass.getSetterType(name);
-      } else {
-        return metaValue.getSetterType(prop.getChildren());
-      }
-    } else {
-      return metaClass.getSetterType(name);
-    }
-  }
+//  @Override
+//  public Class<?> getSetterType(String name) {
+//    PropertyTokenizer prop = new PropertyTokenizer(name);
+//    if (prop.hasNext()) {
+//      MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
+//      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
+//        return metaClass.getSetterType(name);
+//      } else {
+//        return metaValue.getSetterType(prop.getChildren());
+//      }
+//    } else {
+//      return metaClass.getSetterType(name);
+//    }
+//  }
 
-  @Override
-  public Class<?> getGetterType(String name) {
-    PropertyTokenizer prop = new PropertyTokenizer(name);
-    if (prop.hasNext()) {
-      MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
-      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
-        return metaClass.getGetterType(name);
-      } else {
-        return metaValue.getGetterType(prop.getChildren());
-      }
-    } else {
-      return metaClass.getGetterType(name);
-    }
-  }
+//  @Override
+//  public Class<?> getGetterType(String name) {
+//    PropertyTokenizer prop = new PropertyTokenizer(name);
+//    if (prop.hasNext()) {
+//      MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
+//      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
+//        return metaClass.getGetterType(name);
+//      } else {
+//        return metaValue.getGetterType(prop.getChildren());
+//      }
+//    } else {
+//      return metaClass.getGetterType(name);
+//    }
+//  }
 
-  @Override
-  public boolean hasSetter(String name) {
-    PropertyTokenizer prop = new PropertyTokenizer(name);
-    if (prop.hasNext()) {
-      if (metaClass.hasSetter(prop.getIndexedName())) {
-        MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
-        if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
-          return metaClass.hasSetter(name);
-        } else {
-          return metaValue.hasSetter(prop.getChildren());
-        }
-      } else {
-        return false;
-      }
-    } else {
-      return metaClass.hasSetter(name);
-    }
-  }
+//  @Override
+//  public boolean hasSetter(String name) {
+//    PropertyTokenizer prop = new PropertyTokenizer(name);
+//    if (prop.hasNext()) {
+//      if (metaClass.hasSetter(prop.getIndexedName())) {
+//        MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
+//        if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
+//          return metaClass.hasSetter(name);
+//        } else {
+//          return metaValue.hasSetter(prop.getChildren());
+//        }
+//      } else {
+//        return false;
+//      }
+//    } else {
+//      return metaClass.hasSetter(name);
+//    }
+//  }
 
-  @Override
-  public boolean hasGetter(String name) {
-    PropertyTokenizer prop = new PropertyTokenizer(name);
-    if (prop.hasNext()) {
-      if (metaClass.hasGetter(prop.getIndexedName())) {
-        MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
-        if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
-          return metaClass.hasGetter(name);
-        } else {
-          return metaValue.hasGetter(prop.getChildren());
-        }
-      } else {
-        return false;
-      }
-    } else {
-      return metaClass.hasGetter(name);
-    }
-  }
+//  @Override
+//  public boolean hasGetter(String name) {
+//    PropertyTokenizer prop = new PropertyTokenizer(name);
+//    if (prop.hasNext()) {
+//      if (metaClass.hasGetter(prop.getIndexedName())) {
+//        MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
+//        if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
+//          return metaClass.hasGetter(name);
+//        } else {
+//          return metaValue.hasGetter(prop.getChildren());
+//        }
+//      } else {
+//        return false;
+//      }
+//    } else {
+//      return metaClass.hasGetter(name);
+//    }
+//  }
 
 //  @Override
 //  public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {

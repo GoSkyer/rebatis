@@ -123,7 +123,7 @@ public class Parser {
                 values.add(parameter);
             } else {
                 //pojo或者map
-                Object value = MetaObject.forObject(parameter, objectWrapperFactory, reflectorFactory).getValue(name);
+                Object value = MetaObject.forObject(parameter).getValue(name);
                 values.add(value);
             }
 
