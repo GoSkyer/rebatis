@@ -36,10 +36,10 @@ public class CollectionWrapper implements ObjectWrapper {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public void set(PropertyTokenizer prop, Object value) {
-    throw new UnsupportedOperationException();
-  }
+//  @Override
+//  public void set(PropertyTokenizer prop, Object value) {
+//    throw new UnsupportedOperationException();
+//  }
 
 //  @Override
 //  public String findProperty(String name, boolean useCamelCaseMapping) {

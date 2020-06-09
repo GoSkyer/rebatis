@@ -64,19 +64,19 @@ public class MetaClass {
     return reflector.getGetablePropertyNames();
   }
 
-  public String[] getSetterNames() {
-    return reflector.getSetablePropertyNames();
-  }
+//  public String[] getSetterNames() {
+//    return reflector.getSetablePropertyNames();
+//  }
 
-  public Class<?> getSetterType(String name) {
-    PropertyTokenizer prop = new PropertyTokenizer(name);
-    if (prop.hasNext()) {
-      MetaClass metaProp = metaClassForProperty(prop.getName());
-      return metaProp.getSetterType(prop.getChildren());
-    } else {
-      return reflector.getSetterType(prop.getName());
-    }
-  }
+//  public Class<?> getSetterType(String name) {
+//    PropertyTokenizer prop = new PropertyTokenizer(name);
+//    if (prop.hasNext()) {
+//      MetaClass metaProp = metaClassForProperty(prop.getName());
+//      return metaProp.getSetterType(prop.getChildren());
+//    } else {
+//      return reflector.getSetterType(prop.getName());
+//    }
+//  }
 
   public Class<?> getGetterType(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
@@ -164,9 +164,9 @@ public class MetaClass {
     return reflector.getGetInvoker(name);
   }
 
-  public Invoker getSetInvoker(String name) {
-    return reflector.getSetInvoker(name);
-  }
+//  public Invoker getSetInvoker(String name) {
+//    return reflector.getSetInvoker(name);
+//  }
 
   private StringBuilder buildProperty(String name, StringBuilder builder) {
     PropertyTokenizer prop = new PropertyTokenizer(name);

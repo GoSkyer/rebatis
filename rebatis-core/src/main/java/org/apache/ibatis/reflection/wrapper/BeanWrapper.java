@@ -43,15 +43,15 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
-  @Override
-  public void set(PropertyTokenizer prop, Object value) {
-    if (prop.getIndex() != null) {
-      Object collection = resolveCollection(prop, object);
-      setCollectionValue(prop, collection, value);
-    } else {
-      setBeanProperty(prop, object, value);
-    }
-  }
+//  @Override
+//  public void set(PropertyTokenizer prop, Object value) {
+//    if (prop.getIndex() != null) {
+//      Object collection = resolveCollection(prop, object);
+//      setCollectionValue(prop, collection, value);
+//    } else {
+//      setBeanProperty(prop, object, value);
+//    }
+//  }
 
 //  @Override
 //  public String findProperty(String name, boolean useCamelCaseMapping) {
@@ -165,19 +165,19 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
-  private void setBeanProperty(PropertyTokenizer prop, Object object, Object value) {
-    try {
-      Invoker method = metaClass.getSetInvoker(prop.getName());
-      Object[] params = {value};
-      try {
-        method.invoke(object, params);
-      } catch (Throwable t) {
-        throw ExceptionUtil.unwrapThrowable(t);
-      }
-    } catch (Throwable t) {
-      throw new ReflectionException("Could not set property '" + prop.getName() + "' of '" + object.getClass() + "' with value '" + value + "' Cause: " + t.toString(), t);
-    }
-  }
+//  private void setBeanProperty(PropertyTokenizer prop, Object object, Object value) {
+//    try {
+//      Invoker method = metaClass.getSetInvoker(prop.getName());
+//      Object[] params = {value};
+//      try {
+//        method.invoke(object, params);
+//      } catch (Throwable t) {
+//        throw ExceptionUtil.unwrapThrowable(t);
+//      }
+//    } catch (Throwable t) {
+//      throw new ReflectionException("Could not set property '" + prop.getName() + "' of '" + object.getClass() + "' with value '" + value + "' Cause: " + t.toString(), t);
+//    }
+//  }
 
   @Override
   public boolean isCollection() {

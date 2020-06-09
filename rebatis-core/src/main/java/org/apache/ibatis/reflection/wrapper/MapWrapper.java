@@ -43,15 +43,15 @@ public class MapWrapper extends BaseWrapper {
     }
   }
 
-  @Override
-  public void set(PropertyTokenizer prop, Object value) {
-    if (prop.getIndex() != null) {
-      Object collection = resolveCollection(prop, map);
-      setCollectionValue(prop, collection, value);
-    } else {
-      map.put(prop.getName(), value);
-    }
-  }
+//  @Override
+//  public void set(PropertyTokenizer prop, Object value) {
+//    if (prop.getIndex() != null) {
+//      Object collection = resolveCollection(prop, map);
+//      setCollectionValue(prop, collection, value);
+//    } else {
+//      map.put(prop.getName(), value);
+//    }
+//  }
 
 //  @Override
 //  public String findProperty(String name, boolean useCamelCaseMapping) {
