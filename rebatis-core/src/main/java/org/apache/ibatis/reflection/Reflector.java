@@ -15,13 +15,13 @@
  */
 package org.apache.ibatis.reflection;
 
-import org.apache.ibatis.reflection.invoker.*;
-import org.apache.ibatis.reflection.property.PropertyNamer;
+import org.apache.ibatis.reflection.invoker.GetFieldInvoker;
+import org.apache.ibatis.reflection.invoker.Invoker;
 
 import java.lang.reflect.*;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * This class represents a cached set of class definition information that

@@ -31,21 +31,19 @@ import java.util.Collection;
  */
 public class MetaClass {
 
-  private final ReflectorFactory reflectorFactory;
   private final Reflector reflector;
 
-  private MetaClass(Class<?> type, ReflectorFactory reflectorFactory) {
-    this.reflectorFactory = reflectorFactory;
-    this.reflector = reflectorFactory.findForClass(type);
+  private MetaClass(Class<?> type) {
+    this.reflector = DefaultReflectorFactory.findForClass(type);
   }
 
-  public static MetaClass forClass(Class<?> type, ReflectorFactory reflectorFactory) {
-    return new MetaClass(type, reflectorFactory);
+  public static MetaClass forClass(Class<?> type) {
+    return new MetaClass(type);
   }
 
   public MetaClass metaClassForProperty(String name) {
     Class<?> propType = reflector.getGetterType(name);
-    return MetaClass.forClass(propType, reflectorFactory);
+    return MetaClass.forClass(propType);
   }
 
   public String findProperty(String name) {

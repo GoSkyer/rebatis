@@ -1,10 +1,6 @@
 package org.gosky.parsing;
 
-import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.ReflectorFactory;
-import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
-import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -17,10 +13,6 @@ import java.util.*;
  * @date: 2019-05-26 15:10
  **/
 public class Parser {
-
-    protected ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
-//    protected ObjectFactory objectFactory = new DefaultObjectFactory();
-    protected ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory();
 
     private List<Class<?>> typeList = new ArrayList<Class<?>>() {{
         add(String.class);

@@ -18,14 +18,13 @@ package org.apache.ibatis.reflection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class DefaultReflectorFactory implements ReflectorFactory {
-  private final ConcurrentMap<Class<?>, Reflector> reflectorMap = new ConcurrentHashMap<>();
+public class DefaultReflectorFactory  {
+  private static final ConcurrentMap<Class<?>, Reflector> reflectorMap = new ConcurrentHashMap<>();
 
   public DefaultReflectorFactory() {
   }
 
-  @Override
-  public Reflector findForClass(Class<?> type) {
+  public static Reflector findForClass(Class<?> type) {
     // synchronized (type) removed see issue #461
     return reflectorMap.computeIfAbsent(type, Reflector::new);
   }

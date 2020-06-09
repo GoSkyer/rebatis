@@ -28,8 +28,6 @@ public class MetaObject {
 
 //  private final Object originalObject;
   private final ObjectWrapper objectWrapper;
-  private final ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
-
   private MetaObject(Object object ) {
 //    this.originalObject = object;
 
@@ -54,10 +52,6 @@ public class MetaObject {
     } else {
       return new MetaObject(object);
     }
-  }
-
-  public ReflectorFactory getReflectorFactory() {
-    return reflectorFactory;
   }
 
   public Object getValue(String name) {
