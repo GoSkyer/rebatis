@@ -16,11 +16,9 @@
 package org.apache.ibatis.reflection.wrapper;
 
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Clinton Begin
@@ -43,20 +41,20 @@ public class CollectionWrapper implements ObjectWrapper {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public String findProperty(String name, boolean useCamelCaseMapping) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String[] getGetterNames() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String[] getSetterNames() {
-    throw new UnsupportedOperationException();
-  }
+//  @Override
+//  public String findProperty(String name, boolean useCamelCaseMapping) {
+//    throw new UnsupportedOperationException();
+//  }
+//
+//  @Override
+//  public String[] getGetterNames() {
+//    throw new UnsupportedOperationException();
+//  }
+//
+//  @Override
+//  public String[] getSetterNames() {
+//    throw new UnsupportedOperationException();
+//  }
 
   @Override
   public Class<?> getSetterType(String name) {
@@ -78,10 +76,10 @@ public class CollectionWrapper implements ObjectWrapper {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {
-    throw new UnsupportedOperationException();
-  }
+//  @Override
+//  public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {
+//    throw new UnsupportedOperationException();
+//  }
 
   @Override
   public boolean isCollection() {
@@ -93,9 +91,9 @@ public class CollectionWrapper implements ObjectWrapper {
     object.add(element);
   }
 
-  @Override
-  public <E> void addAll(List<E> element) {
-    object.addAll(element);
-  }
+//  @Override
+//  public <E> void addAll(List<E> element) {
+//    object.addAll(element);
+//  }
 
 }

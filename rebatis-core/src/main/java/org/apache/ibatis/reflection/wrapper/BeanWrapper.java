@@ -16,11 +16,8 @@
 package org.apache.ibatis.reflection.wrapper;
 
 import org.apache.ibatis.reflection.*;
-import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.invoker.Invoker;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
-
-import java.util.List;
 
 /**
  * @author Clinton Begin
@@ -56,20 +53,20 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
-  @Override
-  public String findProperty(String name, boolean useCamelCaseMapping) {
-    return metaClass.findProperty(name, useCamelCaseMapping);
-  }
-
-  @Override
-  public String[] getGetterNames() {
-    return metaClass.getGetterNames();
-  }
-
-  @Override
-  public String[] getSetterNames() {
-    return metaClass.getSetterNames();
-  }
+//  @Override
+//  public String findProperty(String name, boolean useCamelCaseMapping) {
+//    return metaClass.findProperty(name, useCamelCaseMapping);
+//  }
+//
+//  @Override
+//  public String[] getGetterNames() {
+//    return metaClass.getGetterNames();
+//  }
+//
+//  @Override
+//  public String[] getSetterNames() {
+//    return metaClass.getSetterNames();
+//  }
 
   @Override
   public Class<?> getSetterType(String name) {
@@ -139,19 +136,19 @@ public class BeanWrapper extends BaseWrapper {
     }
   }
 
-  @Override
-  public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {
-    MetaObject metaValue;
-    Class<?> type = getSetterType(prop.getName());
-    try {
-      Object newObject = objectFactory.create(type);
-      metaValue = MetaObject.forObject(newObject, metaObject.getObjectFactory(), metaObject.getObjectWrapperFactory(), metaObject.getReflectorFactory());
-      set(prop, newObject);
-    } catch (Exception e) {
-      throw new ReflectionException("Cannot set value of property '" + name + "' because '" + name + "' is null and cannot be instantiated on instance of " + type.getName() + ". Cause:" + e.toString(), e);
-    }
-    return metaValue;
-  }
+//  @Override
+//  public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {
+//    MetaObject metaValue;
+//    Class<?> type = getSetterType(prop.getName());
+//    try {
+//      Object newObject = objectFactory.create(type);
+//      metaValue = MetaObject.forObject(newObject, metaObject.getObjectFactory(), metaObject.getObjectWrapperFactory(), metaObject.getReflectorFactory());
+//      set(prop, newObject);
+//    } catch (Exception e) {
+//      throw new ReflectionException("Cannot set value of property '" + name + "' because '" + name + "' is null and cannot be instantiated on instance of " + type.getName() + ". Cause:" + e.toString(), e);
+//    }
+//    return metaValue;
+//  }
 
   private Object getBeanProperty(PropertyTokenizer prop, Object object) {
     try {
@@ -192,9 +189,9 @@ public class BeanWrapper extends BaseWrapper {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public <E> void addAll(List<E> list) {
-    throw new UnsupportedOperationException();
-  }
+//  @Override
+//  public <E> void addAll(List<E> list) {
+//    throw new UnsupportedOperationException();
+//  }
 
 }

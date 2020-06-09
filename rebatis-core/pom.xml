@@ -60,6 +60,18 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-mysql-client</artifactId>
+            <version>4.0.0-milestone5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-sql-client-templates</artifactId>
+            <version>4.0.0-milestone5</version>
+        </dependency>
+
     </dependencies>
 
     <build>

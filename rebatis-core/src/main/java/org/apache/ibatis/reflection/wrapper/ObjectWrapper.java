@@ -15,11 +15,7 @@
  */
 package org.apache.ibatis.reflection.wrapper;
 
-import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
-
-import java.util.List;
 
 /**
  * @author Clinton Begin
@@ -30,11 +26,11 @@ public interface ObjectWrapper {
 
   void set(PropertyTokenizer prop, Object value);
 
-  String findProperty(String name, boolean useCamelCaseMapping);
-
-  String[] getGetterNames();
-
-  String[] getSetterNames();
+//  String findProperty(String name, boolean useCamelCaseMapping);
+//
+//  String[] getGetterNames();
+//
+//  String[] getSetterNames();
 
   Class<?> getSetterType(String name);
 
@@ -44,12 +40,12 @@ public interface ObjectWrapper {
 
   boolean hasGetter(String name);
 
-  MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory);
+//  MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory);
 
   boolean isCollection();
 
   void add(Object element);
 
-  <E> void addAll(List<E> element);
+//  <E> void addAll(List<E> element);
 
 }

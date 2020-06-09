@@ -25,15 +25,15 @@ public class DefaultReflectorFactory implements ReflectorFactory {
   public DefaultReflectorFactory() {
   }
 
-  @Override
-  public boolean isClassCacheEnabled() {
-    return classCacheEnabled;
-  }
-
-  @Override
-  public void setClassCacheEnabled(boolean classCacheEnabled) {
-    this.classCacheEnabled = classCacheEnabled;
-  }
+//  @Override
+//  public boolean isClassCacheEnabled() {
+//    return classCacheEnabled;
+//  }
+//
+//  @Override
+//  public void setClassCacheEnabled(boolean classCacheEnabled) {
+//    this.classCacheEnabled = classCacheEnabled;
+//  }
 
   @Override
   public Reflector findForClass(Class<?> type) {

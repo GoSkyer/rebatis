@@ -15,12 +15,10 @@
  */
 package org.apache.ibatis.reflection;
 
-import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 import org.apache.ibatis.reflection.wrapper.*;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,15 +26,15 @@ import java.util.Map;
  */
 public class MetaObject {
 
-  private final Object originalObject;
+//  private final Object originalObject;
   private final ObjectWrapper objectWrapper;
-  private final ObjectFactory objectFactory;
+//  private final ObjectFactory objectFactory;
   private final ObjectWrapperFactory objectWrapperFactory;
   private final ReflectorFactory reflectorFactory;
 
-  private MetaObject(Object object, ObjectFactory objectFactory, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
-    this.originalObject = object;
-    this.objectFactory = objectFactory;
+  private MetaObject(Object object, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
+//    this.originalObject = object;
+//    this.objectFactory = objectFactory;
     this.objectWrapperFactory = objectWrapperFactory;
     this.reflectorFactory = reflectorFactory;
 
@@ -54,42 +52,42 @@ public class MetaObject {
   }
 
 
-  public static MetaObject forObject(Object object, ObjectFactory objectFactory, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
+  public static MetaObject forObject(Object object, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
     if (object == null) {
       return SystemMetaObject.NULL_META_OBJECT;
     } else {
-      return new MetaObject(object, objectFactory, objectWrapperFactory, reflectorFactory);
+      return new MetaObject(object, objectWrapperFactory, reflectorFactory);
     }
   }
 
 
-  public ObjectFactory getObjectFactory() {
-    return objectFactory;
-  }
-
-  public ObjectWrapperFactory getObjectWrapperFactory() {
-    return objectWrapperFactory;
-  }
+//  public ObjectFactory getObjectFactory() {
+//    return objectFactory;
+//  }
+//
+//  public ObjectWrapperFactory getObjectWrapperFactory() {
+//    return objectWrapperFactory;
+//  }
 
   public ReflectorFactory getReflectorFactory() {
     return reflectorFactory;
   }
-
-  public Object getOriginalObject() {
-    return originalObject;
-  }
-
-  public String findProperty(String propName, boolean useCamelCaseMapping) {
-    return objectWrapper.findProperty(propName, useCamelCaseMapping);
-  }
-
-  public String[] getGetterNames() {
-    return objectWrapper.getGetterNames();
-  }
-
-  public String[] getSetterNames() {
-    return objectWrapper.getSetterNames();
-  }
+//
+//  public Object getOriginalObject() {
+//    return originalObject;
+//  }
+//
+//  public String findProperty(String propName, boolean useCamelCaseMapping) {
+//    return objectWrapper.findProperty(propName, useCamelCaseMapping);
+//  }
+//
+//  public String[] getGetterNames() {
+//    return objectWrapper.getGetterNames();
+//  }
+//
+//  public String[] getSetterNames() {
+//    return objectWrapper.getSetterNames();
+//  }
 
   public Class<?> getSetterType(String name) {
     return objectWrapper.getSetterType(name);
@@ -121,32 +119,32 @@ public class MetaObject {
     }
   }
 
-  public void setValue(String name, Object value) {
-    PropertyTokenizer prop = new PropertyTokenizer(name);
-    if (prop.hasNext()) {
-      MetaObject metaValue = metaObjectForProperty(prop.getIndexedName());
-      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
-        if (value == null) {
-          // don't instantiate child path if value is null
-          return;
-        } else {
-          metaValue = objectWrapper.instantiatePropertyValue(name, prop, objectFactory);
-        }
-      }
-      metaValue.setValue(prop.getChildren(), value);
-    } else {
-      objectWrapper.set(prop, value);
-    }
-  }
+//  public void setValue(String name, Object value) {
+//    PropertyTokenizer prop = new PropertyTokenizer(name);
+//    if (prop.hasNext()) {
+//      MetaObject metaValue = metaObjectForProperty(prop.getIndexedName());
+//      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
+//        if (value == null) {
+//          // don't instantiate child path if value is null
+//          return;
+//        } else {
+//          metaValue = objectWrapper.instantiatePropertyValue(name, prop, objectFactory);
+//        }
+//      }
+//      metaValue.setValue(prop.getChildren(), value);
+//    } else {
+//      objectWrapper.set(prop, value);
+//    }
+//  }
 
   public MetaObject metaObjectForProperty(String name) {
     Object value = getValue(name);
-    return MetaObject.forObject(value, objectFactory, objectWrapperFactory, reflectorFactory);
+    return MetaObject.forObject(value, objectWrapperFactory, reflectorFactory);
   }
 
-  public ObjectWrapper getObjectWrapper() {
-    return objectWrapper;
-  }
+//  public ObjectWrapper getObjectWrapper() {
+//    return objectWrapper;
+//  }
 
   public boolean isCollection() {
     return objectWrapper.isCollection();
@@ -156,8 +154,8 @@ public class MetaObject {
     objectWrapper.add(element);
   }
 
-  public <E> void addAll(List<E> list) {
-    objectWrapper.addAll(list);
-  }
+//  public <E> void addAll(List<E> list) {
+//    objectWrapper.addAll(list);
+//  }
 
 }

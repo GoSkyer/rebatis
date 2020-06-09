@@ -17,11 +17,8 @@ package org.apache.ibatis.reflection.wrapper;
 
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
-import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,20 +53,20 @@ public class MapWrapper extends BaseWrapper {
     }
   }
 
-  @Override
-  public String findProperty(String name, boolean useCamelCaseMapping) {
-    return name;
-  }
-
-  @Override
-  public String[] getGetterNames() {
-    return map.keySet().toArray(new String[map.keySet().size()]);
-  }
-
-  @Override
-  public String[] getSetterNames() {
-    return map.keySet().toArray(new String[map.keySet().size()]);
-  }
+//  @Override
+//  public String findProperty(String name, boolean useCamelCaseMapping) {
+//    return name;
+//  }
+//
+//  @Override
+//  public String[] getGetterNames() {
+//    return map.keySet().toArray(new String[map.keySet().size()]);
+//  }
+//
+//  @Override
+//  public String[] getSetterNames() {
+//    return map.keySet().toArray(new String[map.keySet().size()]);
+//  }
 
   @Override
   public Class<?> getSetterType(String name) {
@@ -133,12 +130,12 @@ public class MapWrapper extends BaseWrapper {
     }
   }
 
-  @Override
-  public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {
-    HashMap<String, Object> map = new HashMap<>();
-    set(prop, map);
-    return MetaObject.forObject(map, metaObject.getObjectFactory(), metaObject.getObjectWrapperFactory(), metaObject.getReflectorFactory());
-  }
+//  @Override
+//  public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {
+//    HashMap<String, Object> map = new HashMap<>();
+//    set(prop, map);
+//    return MetaObject.forObject(map, metaObject.getObjectFactory(), metaObject.getObjectWrapperFactory(), metaObject.getReflectorFactory());
+//  }
 
   @Override
   public boolean isCollection() {
@@ -150,9 +147,9 @@ public class MapWrapper extends BaseWrapper {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public <E> void addAll(List<E> element) {
-    throw new UnsupportedOperationException();
-  }
+//  @Override
+//  public <E> void addAll(List<E> element) {
+//    throw new UnsupportedOperationException();
+//  }
 
 }

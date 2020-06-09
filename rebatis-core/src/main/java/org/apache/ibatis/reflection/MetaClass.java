@@ -187,8 +187,4 @@ public class MetaClass {
     return builder;
   }
 
-  public boolean hasDefaultConstructor() {
-    return reflector.hasDefaultConstructor();
-  }
-
 }
