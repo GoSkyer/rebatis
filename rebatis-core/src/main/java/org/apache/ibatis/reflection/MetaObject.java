@@ -32,9 +32,7 @@ public class MetaObject {
 
   private MetaObject(Object object ) {
 //    this.originalObject = object;
-//    this.objectFactory = objectFactory;
 
-    //  private final ObjectFactory objectFactory;
     ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory();
     if (object instanceof ObjectWrapper) {
       this.objectWrapper = (ObjectWrapper) object;
@@ -58,50 +56,9 @@ public class MetaObject {
     }
   }
 
-
-//  public ObjectFactory getObjectFactory() {
-//    return objectFactory;
-//  }
-//
-//  public ObjectWrapperFactory getObjectWrapperFactory() {
-//    return objectWrapperFactory;
-//  }
-
   public ReflectorFactory getReflectorFactory() {
     return reflectorFactory;
   }
-//
-//  public Object getOriginalObject() {
-//    return originalObject;
-//  }
-//
-//  public String findProperty(String propName, boolean useCamelCaseMapping) {
-//    return objectWrapper.findProperty(propName, useCamelCaseMapping);
-//  }
-//
-//  public String[] getGetterNames() {
-//    return objectWrapper.getGetterNames();
-//  }
-//
-//  public String[] getSetterNames() {
-//    return objectWrapper.getSetterNames();
-//  }
-
-//  public Class<?> getSetterType(String name) {
-//    return objectWrapper.getSetterType(name);
-//  }
-//
-//  public Class<?> getGetterType(String name) {
-//    return objectWrapper.getGetterType(name);
-//  }
-
-//  public boolean hasSetter(String name) {
-//    return objectWrapper.hasSetter(name);
-//  }
-
-//  public boolean hasGetter(String name) {
-//    return objectWrapper.hasGetter(name);
-//  }
 
   public Object getValue(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
@@ -116,24 +73,6 @@ public class MetaObject {
       return objectWrapper.get(prop);
     }
   }
-
-//  public void setValue(String name, Object value) {
-//    PropertyTokenizer prop = new PropertyTokenizer(name);
-//    if (prop.hasNext()) {
-//      MetaObject metaValue = metaObjectForProperty(prop.getIndexedName());
-//      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
-//        if (value == null) {
-//          // don't instantiate child path if value is null
-//          return;
-//        } else {
-//          metaValue = objectWrapper.instantiatePropertyValue(name, prop, objectFactory);
-//        }
-//      }
-//      metaValue.setValue(prop.getChildren(), value);
-//    } else {
-//      objectWrapper.set(prop, value);
-//    }
-//  }
 
   public MetaObject metaObjectForProperty(String name) {
     Object value = getValue(name);
