@@ -15,9 +15,6 @@
  */
 package org.apache.ibatis.reflection;
 
-import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
-import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
-
 /**
  * @author Clinton Begin
  */
