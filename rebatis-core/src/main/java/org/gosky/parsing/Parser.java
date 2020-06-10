@@ -1,5 +1,15 @@
 package org.gosky.parsing;
 
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.SQLObject;
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
+import com.alibaba.druid.sql.ast.statement.SQLSelectQuery;
+import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlSchemaStatVisitor;
+import com.alibaba.druid.util.JdbcConstants;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.lang.reflect.Method;
@@ -7,12 +17,16 @@ import java.lang.reflect.Parameter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author: Galaxy
  * @date: 2019-05-26 15:10
  **/
 public class Parser {
+
+    private static Pattern PARAM_PATTERN = Pattern.compile("(?<!\\\\)#\\{(.*)}");
 
     private List<Class<?>> typeList = new ArrayList<Class<?>>() {{
         add(String.class);
@@ -93,8 +107,41 @@ public class Parser {
         ParamNameResolver paramNameResolver = new ParamNameResolver(method);
         Object parameter = paramNameResolver.getNamedParams(args);
         //parameterMappings 如果多参数那么是个map,如果单参数且不是list/array 就是原对象
+        ParseSqlResult parseSqlResult = replaceSqlWithParameters(sqlBeforeParse, parameter);
 
-        return replaceSqlWithParameters(sqlBeforeParse, parameter);
+        //处理掉为空的where条件
+        SQLStatement sqlStatement = SQLUtils.parseStatements(parseSqlResult.getSql(), JdbcConstants.MYSQL).get(0);
+        Map<String, Object> paramMapping = parseSqlResult.getParamMapping();
+
+        if (sqlStatement instanceof SQLSelectStatement) {
+            //只处理是查询的
+            SQLSelectQuery query = ((SQLSelectStatement) sqlStatement).getSelect().getQuery();
+            if (query instanceof SQLSelectQueryBlock) {
+                SQLExpr where = ((SQLSelectQueryBlock) query).getWhere();
+                if (where instanceof SQLBinaryOpExpr){
+                    for (SQLExpr sqlExpr : SQLBinaryOpExpr.split((SQLBinaryOpExpr) where)) {
+                        if (sqlExpr instanceof SQLBinaryOpExpr) {
+                            String right = ((SQLBinaryOpExpr) sqlExpr).getRight().toString();
+                            Matcher matcher = PARAM_PATTERN.matcher(right);
+                            if (matcher.find()) {
+                                right = matcher.group(1);
+                                Object value = paramMapping.get(right);
+                                if (paramMapping.containsKey(right) && value == null) {
+                                    ((SQLSelectQueryBlock) query).removeCondition((sqlExpr));
+                                }
+                            }
+                        }
+                    }
+                }
+                parseSqlResult.setSql(query.toString());
+
+            }
+
+
+
+        }
+
+        return parseSqlResult;
 
     }
 
@@ -103,25 +150,29 @@ public class Parser {
         List<String> mapping = new ArrayList<>();
         GenericTokenParser parser = new GenericTokenParser("#{", "}", content -> {
             mapping.add(content);
-            return "?";
+            return "#{" + content.replace(".","-") + "}";
         });
 
         String sqlAfterParse = parser.parse(sqlBeforeParse);
         List<Object> values = new LinkedList<>();
+        Map<String, Object> paramMapping = new HashMap<>();
 
         for (String name : mapping) {
-            if (typeList.contains(parameter.getClass())){
+            String encodeName = name.replace(".", "-");
+            if (typeList.contains(parameter.getClass())) {
                 //单参数java基础类型
                 values.add(parameter);
+                paramMapping.put(encodeName, parameter);
             } else {
                 //pojo或者map
                 Object value = MetaObject.forObject(parameter).getValue(name);
                 values.add(value);
+                paramMapping.put(encodeName, value);
             }
 
         }
 
-        return new ParseSqlResult(sqlAfterParse, values);
+        return new ParseSqlResult(sqlAfterParse, values, paramMapping);
 
     }
 
