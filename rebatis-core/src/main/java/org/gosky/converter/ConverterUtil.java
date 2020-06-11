@@ -1,29 +1,18 @@
 package org.gosky.converter;
 
-import com.github.jasync.sql.db.QueryResult;
-import com.github.jasync.sql.db.ResultSet;
-import com.github.jasync.sql.db.RowData;
-
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowIterator;
 import io.vertx.sqlclient.RowSet;
+import lombok.extern.slf4j.Slf4j;
 import org.gosky.common.ReturnTypeEnum;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
-
-import javax.persistence.Entity;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Auther: guozhong
@@ -33,19 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ConverterUtil {
-    private ConverterFactory converterFactory;
     private static ConverterUtil singleton;
 
-    private ConverterUtil(ConverterFactory converterFactory) {
-        this.converterFactory = converterFactory;
+    private ConverterUtil() {
     }
 
-    public static ConverterUtil with(ConverterFactory converterFactory) {
+    public static ConverterUtil with() {
         if (singleton == null) {
             synchronized (ConverterUtil.class) {
                 if (singleton == null) {
-                    singleton = new ConverterUtil(converterFactory);
-                    converterFactory.init();
+                    singleton = new ConverterUtil();
                 }
             }
         }

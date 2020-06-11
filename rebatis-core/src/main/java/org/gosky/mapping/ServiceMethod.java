@@ -1,16 +1,14 @@
 package org.gosky.mapping;
 
-import com.github.jasync.sql.db.QueryResult;
-
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
-import org.gosky.Rebatis;
-import org.gosky.adapter.CallAdapter;
-import org.gosky.adapter.DefaultCall;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.gosky.Rebatis;
+import org.gosky.adapter.CallAdapter;
+import org.gosky.adapter.DefaultCall;
 import org.gosky.common.ReturnTypeEnum;
 import org.gosky.common.SQLType;
 import org.gosky.converter.ConverterFactory;
@@ -112,6 +110,7 @@ public class ServiceMethod {
 
     /**
      * 解析sql并执行
+     *
      * @param args service方法中的参数
      * @return
      * @throws Exception
@@ -119,15 +118,19 @@ public class ServiceMethod {
     public Object invoke(Object[] args) throws Exception {
 
         ParseSqlResult sqlResult = Parser.parse(sqlFactory.getSql(), sqlFactory.getMethod(), args);
-        logger.info("run sql={}, params={}", sqlResult.getSql(), sqlResult.getValues());
+        long start = System.currentTimeMillis();
         CompletableFuture<Object> future = executor.query(sqlResult.getSql(), sqlResult.getValues()).thenApply(queryResult -> convert(queryResult));
-
+        future.thenAccept(o -> {
+            logger.info("run sql={}, params={}, duration={}, result={}", sqlResult.getSql(),
+                    sqlResult.getValues(), System.currentTimeMillis() - start,
+                    o);
+        });
         return callAdapter.adapt(new DefaultCall(future));
 
     }
 
     private Object convert(RowSet<Row> queryResult) {
-        return ConverterUtil.with(converterFactory).convert(queryResult, sqlFactory.getReturnTypeEnum()
+        return ConverterUtil.with().convert(queryResult, sqlFactory.getReturnTypeEnum()
                 , sqlFactory.getResponseType());
     }
 }

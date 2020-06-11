@@ -1,9 +1,7 @@
 package org.gosky;
 
-import com.github.jasync.sql.db.mysql.MySQLConnection;
-import com.github.jasync.sql.db.pool.ConnectionPool;
-
 import io.vertx.mysqlclient.MySQLPool;
+import lombok.extern.slf4j.Slf4j;
 import org.gosky.adapter.CallAdapter;
 import org.gosky.adapter.DefaultCallAdapterFactory;
 import org.gosky.converter.ConverterFactory;
@@ -20,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import lombok.extern.slf4j.Slf4j;
 
 import static java.util.Collections.unmodifiableList;
 import static org.gosky.util.Utils.checkNotNull;
@@ -128,14 +124,14 @@ public class Rebatis {
                 throw new IllegalStateException("connectionPool required.");
             }
 
-            if (converterFactor == null) {
-                try {
-                    this.converterFactor = (ConverterFactory) Class.forName("org.gosky.rebatis.apt.RebatisConverterFactory").newInstance();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new IllegalStateException("converterFactor required.");
-                }
-            }
+//            if (converterFactor == null) {
+//                try {
+//                    this.converterFactor = (ConverterFactory) Class.forName("org.gosky.rebatis.apt.RebatisConverterFactory").newInstance();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    throw new IllegalStateException("converterFactor required.");
+//                }
+//            }
 
             if (callAdapterFactories.size() == 0) {
                 log.debug("callAdapterFactories size = 0, add default call");

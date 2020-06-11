@@ -153,7 +153,10 @@ public class Parser {
                 }
 
                 GenericTokenParser parser2 = new GenericTokenParser("#{", "}", content -> "?");
-                return new ParseSqlResult(parser2.parse(query.toString()), new ArrayList<>(paramMapping.values()));
+                String sql2 = parser2.parse(SQLUtils.toMySqlString(query,
+                        new SQLUtils.FormatOption(false, false)));
+                return new ParseSqlResult(sql2,
+                        new ArrayList<>(paramMapping.values()));
             }
         }
 
