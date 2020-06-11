@@ -1,20 +1,18 @@
 package org.gosky.rebatis.sample;
 
 
-import com.github.jasync.sql.db.mysql.MySQLConnection;
-import com.github.jasync.sql.db.mysql.MySQLConnectionBuilder;
-import com.github.jasync.sql.db.pool.ConnectionPool;
-
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.util.JdbcConstants;
+import io.vertx.mysqlclient.MySQLConnectOptions;
+import io.vertx.mysqlclient.MySQLPool;
+import io.vertx.sqlclient.PoolOptions;
 import org.gosky.Rebatis;
 import org.gosky.adapter.rxjava2.RxJava2CallAdapterFactory;
 import org.gosky.rebatis.apt.RebatisConverterFactory;
 import org.gosky.rebatis.sample.mapper.TestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.TimeUnit;
-
-import kotlin.Unit;
 
 
 /**
@@ -27,48 +25,83 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ConnectionPool<MySQLConnection> connectionPool = MySQLConnectionBuilder.createConnectionPool(t -> {
-            t.setUsername("root");
-            t.setHost("localhost");
-            t.setPort(3306);
-            t.setPassword("123456");
-            t.setDatabase("test");
-            t.setMaxActiveConnections(100);
-            t.setMaxIdleTime(TimeUnit.MINUTES.toMillis(15));
-            t.setMaxPendingQueries(10_000);
-            t.setConnectionValidationInterval(TimeUnit.SECONDS.toMillis(30));
-            return Unit.INSTANCE;
-        });
+        MySQLConnectOptions connectOptions = new MySQLConnectOptions()
+                .setPort(3306)
+                .setHost("the-host")
+                .setDatabase("the-db")
+                .setUser("user")
+                .setPassword("secret");
+
+        // Pool options
+        PoolOptions poolOptions = new PoolOptions()
+                .setMaxSize(5);
+
+        // Create the client pool
+        MySQLPool client = MySQLPool.pool(connectOptions, poolOptions);
+
 
         RebatisConverterFactory rebatisConverterFactory = new RebatisConverterFactory();
 
         Rebatis rebatis = new Rebatis.Builder()
-                .connectionPool(connectionPool)
+                .connectionPool(client)
 //                .converterFactory()
                 .addCallAdapterFactory(new RxJava2CallAdapterFactory())
                 .build();
 
         TestMapper testMapper = rebatis.create(TestMapper.class);
 
-//        testMapper.test()
-//                .enqueue(new Callback<List<User>>() {
-//                    @Override
-//                    public void onResponse(List<User> response) {
-//                        System.out.println(response);
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Throwable t) {
-//                        t.printStackTrace();
-//                    }
-//                });
-        testMapper.test(18, "Tome")
+        User user = new User();
+//        user.setName("zhangsan");
+        user.setAge(10);
+        testMapper.test(user, 10)
                 .subscribe(users -> {
                     System.out.println(users);
                 }, throwable -> {
                     throwable.printStackTrace();
                 });
 
+
+        final String dbType = JdbcConstants.MYSQL; // 可以是ORACLE、POSTGRESQL、SQLSERVER、ODPS等
+
+        String sql = "select * from t where name = #{name} and age = #{age}";
+
+        SQLSelectStatement sqlStatement = (SQLSelectStatement) SQLUtils.parseStatements(sql, dbType).get(0);
+//
+//        SQLSelectQuery sqlSelectQuery = sqlStatement.getSelect().getQuery();
+//        SQLSelectQueryBlock sqlSelectQueryBlock = (SQLSelectQueryBlock) sqlSelectQuery;
+//        SQLExpr where = sqlSelectQueryBlock.getWhere();
+//        System.out.println(where);
+//        List<SQLObject> mergedList = ((SQLBinaryOpExpr) where).getChildren();
+//        SQLExpr sqlObject = (SQLExpr)  mergedList.get(0);
+//        System.out.println(sqlObject.toString());
+//        sqlSelectQueryBlock.removeCondition(sqlObject);
+//        System.out.println(sqlSelectQueryBlock);
+
+//        MySqlSchemaStatVisitor visitor = new MySqlSchemaStatVisitor();
+//        sqlStatement.accept(visitor);
+//        System.out.println(visitor.getConditions());
+//
+
+
+//        // Create the client pool
+//        MySQLPool client = MySQLPool.pool(connectOptions, poolOptions);
+//
+//        // A simple query
+//        client
+//                .preparedQuery("SELECT * FROM users WHERE id='julien'")
+//                .execute(ar -> {
+//                    if (ar.succeeded()) {
+//                        ar.ma
+//                        RowSet<Row> result = ar.result();
+//                        System.out.println("Got " + result.size() + " rows ");
+//                    } else {
+//                        System.out.println("Failure: " + ar.cause().getMessage());
+//                    }
+//                });
+//
+//        SqlTemplate.forQuery()
+//                .mapTo()
+//                .execute();
 
         while (true) {
 

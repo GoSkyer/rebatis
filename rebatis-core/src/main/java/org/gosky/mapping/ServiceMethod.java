@@ -2,6 +2,8 @@ package org.gosky.mapping;
 
 import com.github.jasync.sql.db.QueryResult;
 
+import io.vertx.sqlclient.Row;
+import io.vertx.sqlclient.RowSet;
 import org.gosky.Rebatis;
 import org.gosky.adapter.CallAdapter;
 import org.gosky.adapter.DefaultCall;
@@ -124,7 +126,7 @@ public class ServiceMethod {
 
     }
 
-    private Object convert(QueryResult queryResult) {
+    private Object convert(RowSet<Row> queryResult) {
         return ConverterUtil.with(converterFactory).convert(queryResult, sqlFactory.getReturnTypeEnum()
                 , sqlFactory.getResponseType());
     }

@@ -1,6 +1,7 @@
 package org.gosky.executor;
 
-import com.github.jasync.sql.db.QueryResult;
+import io.vertx.sqlclient.Row;
+import io.vertx.sqlclient.RowSet;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -12,6 +13,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface Executor {
 
-    CompletableFuture<QueryResult> query(String sql, List<?> values);
+    CompletableFuture<RowSet<Row>> query(String sql, List<Object> values);
 
 }

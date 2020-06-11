@@ -1,7 +1,10 @@
 package org.gosky.executor;
 
-import com.github.jasync.sql.db.QueryResult;
-import com.github.jasync.sql.db.pool.ConnectionPool;
+import io.vertx.core.Future;
+import io.vertx.mysqlclient.MySQLPool;
+import io.vertx.sqlclient.Row;
+import io.vertx.sqlclient.RowSet;
+import io.vertx.sqlclient.Tuple;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -13,15 +16,16 @@ import java.util.concurrent.CompletableFuture;
  */
 public class SimpleExecutor implements Executor {
 
-    private final ConnectionPool tConnectionPool;
+    private final MySQLPool tConnectionPool;
 
-    public SimpleExecutor(ConnectionPool tConnectionPool) {
+    public SimpleExecutor(MySQLPool tConnectionPool) {
         this.tConnectionPool = tConnectionPool;
     }
 
     @Override
-    public CompletableFuture<QueryResult> query(String sql, List<?> values) {
-        return tConnectionPool.sendPreparedStatement(sql, values);
+    public CompletableFuture<RowSet<Row>> query(String sql, List<Object> values) {
+        Future<RowSet<Row>> execute = tConnectionPool.preparedQuery(sql).execute(Tuple.tuple(values));
+        return execute.toCompletionStage().toCompletableFuture();
     }
 
 }

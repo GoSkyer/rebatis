@@ -110,7 +110,7 @@ public class Parser {
         ParseSqlResult parseSqlResult = replaceSqlWithParameters(sqlBeforeParse, parameter);
 
         //处理掉为空的where条件
-        SQLStatement sqlStatement = SQLUtils.parseStatements(parseSqlResult.getSql(), JdbcConstants.MYSQL).get(0);
+        SQLStatement sqlStatement = SQLUtils.parseStatements(sqlBeforeParse, JdbcConstants.MYSQL).get(0);
         Map<String, Object> paramMapping = parseSqlResult.getParamMapping();
 
         if (sqlStatement instanceof SQLSelectStatement) {
@@ -150,7 +150,7 @@ public class Parser {
         List<String> mapping = new ArrayList<>();
         GenericTokenParser parser = new GenericTokenParser("#{", "}", content -> {
             mapping.add(content);
-            return "#{" + content.replace(".","-") + "}";
+            return "?";
         });
 
         String sqlAfterParse = parser.parse(sqlBeforeParse);
@@ -158,16 +158,15 @@ public class Parser {
         Map<String, Object> paramMapping = new HashMap<>();
 
         for (String name : mapping) {
-            String encodeName = name.replace(".", "-");
             if (typeList.contains(parameter.getClass())) {
                 //单参数java基础类型
                 values.add(parameter);
-                paramMapping.put(encodeName, parameter);
+                paramMapping.put(name, parameter);
             } else {
                 //pojo或者map
                 Object value = MetaObject.forObject(parameter).getValue(name);
                 values.add(value);
-                paramMapping.put(encodeName, value);
+                paramMapping.put(name, value);
             }
 
         }

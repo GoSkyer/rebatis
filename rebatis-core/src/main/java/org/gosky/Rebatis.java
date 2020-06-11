@@ -3,6 +3,7 @@ package org.gosky;
 import com.github.jasync.sql.db.mysql.MySQLConnection;
 import com.github.jasync.sql.db.pool.ConnectionPool;
 
+import io.vertx.mysqlclient.MySQLPool;
 import org.gosky.adapter.CallAdapter;
 import org.gosky.adapter.DefaultCallAdapterFactory;
 import org.gosky.converter.ConverterFactory;
@@ -100,11 +101,11 @@ public class Rebatis {
 
 
     public static final class Builder {
-        private ConnectionPool<MySQLConnection> connectionPool;
+        private MySQLPool connectionPool;
         private ConverterFactory converterFactor;
         private final List<CallAdapter.Factory> callAdapterFactories = new ArrayList<>();
 
-        public Builder connectionPool(ConnectionPool<MySQLConnection> connectionPool) {
+        public Builder connectionPool(MySQLPool connectionPool) {
             checkNotNull(connectionPool, "connectionPool == null");
             this.connectionPool = connectionPool;
             return this;
