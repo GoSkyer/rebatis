@@ -107,18 +107,35 @@ public class Parser {
         ParamNameResolver paramNameResolver = new ParamNameResolver(method);
         Object parameter = paramNameResolver.getNamedParams(args);
         //parameterMappings 如果多参数那么是个map,如果单参数且不是list/array 就是原对象
-        ParseSqlResult parseSqlResult = replaceSqlWithParameters(sqlBeforeParse, parameter);
+        //sql中的#{name} 的list
+        List<String> mapping = new ArrayList<>();
+        GenericTokenParser parser = new GenericTokenParser("#{", "}", content -> {
+            mapping.add(content);
+            return "?";
+        });
+        //往mapping中添加值
+        String sql1 = parser.parse(sqlBeforeParse);
+        Map<String, Object> paramMapping = new LinkedHashMap<>();
+        for (String name : mapping) {
+            if (typeList.contains(parameter.getClass())) {
+                //单参数java基础类型
+                paramMapping.put(name, parameter);
+            } else {
+                //pojo或者map
+                Object value = MetaObject.forObject(parameter).getValue(name);
+                paramMapping.put(name, value);
+            }
+        }
 
         //处理掉为空的where条件
         SQLStatement sqlStatement = SQLUtils.parseStatements(sqlBeforeParse, JdbcConstants.MYSQL).get(0);
-        Map<String, Object> paramMapping = parseSqlResult.getParamMapping();
 
         if (sqlStatement instanceof SQLSelectStatement) {
             //只处理是查询的
             SQLSelectQuery query = ((SQLSelectStatement) sqlStatement).getSelect().getQuery();
             if (query instanceof SQLSelectQueryBlock) {
                 SQLExpr where = ((SQLSelectQueryBlock) query).getWhere();
-                if (where instanceof SQLBinaryOpExpr){
+                if (where instanceof SQLBinaryOpExpr) {
                     for (SQLExpr sqlExpr : SQLBinaryOpExpr.split((SQLBinaryOpExpr) where)) {
                         if (sqlExpr instanceof SQLBinaryOpExpr) {
                             String right = ((SQLBinaryOpExpr) sqlExpr).getRight().toString();
@@ -128,50 +145,19 @@ public class Parser {
                                 Object value = paramMapping.get(right);
                                 if (paramMapping.containsKey(right) && value == null) {
                                     ((SQLSelectQueryBlock) query).removeCondition((sqlExpr));
+                                    paramMapping.remove(right);
                                 }
                             }
                         }
                     }
                 }
-                parseSqlResult.setSql(query.toString());
 
+                GenericTokenParser parser2 = new GenericTokenParser("#{", "}", content -> "?");
+                return new ParseSqlResult(parser2.parse(query.toString()), new ArrayList<>(paramMapping.values()));
             }
-
-
-
         }
 
-        return parseSqlResult;
-
-    }
-
-    private ParseSqlResult replaceSqlWithParameters(String sqlBeforeParse, Object parameter) {
-        //sql中的#{name} 的list
-        List<String> mapping = new ArrayList<>();
-        GenericTokenParser parser = new GenericTokenParser("#{", "}", content -> {
-            mapping.add(content);
-            return "?";
-        });
-
-        String sqlAfterParse = parser.parse(sqlBeforeParse);
-        List<Object> values = new LinkedList<>();
-        Map<String, Object> paramMapping = new HashMap<>();
-
-        for (String name : mapping) {
-            if (typeList.contains(parameter.getClass())) {
-                //单参数java基础类型
-                values.add(parameter);
-                paramMapping.put(name, parameter);
-            } else {
-                //pojo或者map
-                Object value = MetaObject.forObject(parameter).getValue(name);
-                values.add(value);
-                paramMapping.put(name, value);
-            }
-
-        }
-
-        return new ParseSqlResult(sqlAfterParse, values, paramMapping);
+        return new ParseSqlResult(sql1, new ArrayList<>(paramMapping.values()));
 
     }
 

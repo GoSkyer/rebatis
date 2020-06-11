@@ -36,7 +36,7 @@ public class ConverterUtil {
     private ConverterFactory converterFactory;
     private static ConverterUtil singleton;
 
-    public ConverterUtil(ConverterFactory converterFactory) {
+    private ConverterUtil(ConverterFactory converterFactory) {
         this.converterFactory = converterFactory;
     }
 
