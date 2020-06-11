@@ -29,12 +29,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.jasync-sql</groupId>
-            <artifactId>jasync-mysql</artifactId>
-            <version>1.0.17</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.6</version>
