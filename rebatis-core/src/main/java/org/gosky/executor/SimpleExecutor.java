@@ -24,7 +24,11 @@ public class SimpleExecutor implements Executor {
     @Override
     public Future<RowSet<Row>> query(String sql, List<Object> values) {
         Future<RowSet<Row>> future = Future.future();
-        tConnectionPool.preparedQuery(sql).execute(Tuple.tuple(values), future);
+        if (values != null && values.size() > 0) {
+            tConnectionPool.preparedQuery(sql).execute(Tuple.tuple(values), future);
+        } else {
+            tConnectionPool.query(sql).execute(future);
+        }
         return future;
     }
 
