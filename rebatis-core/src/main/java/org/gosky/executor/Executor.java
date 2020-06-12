@@ -1,10 +1,10 @@
 package org.gosky.executor;
 
+import io.vertx.core.Future;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @Auther: guozhong
@@ -13,6 +13,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface Executor {
 
-    CompletableFuture<RowSet<Row>> query(String sql, List<Object> values);
+    Future<RowSet<Row>> query(String sql, List<Object> values);
 
 }

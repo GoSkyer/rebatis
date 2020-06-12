@@ -1,5 +1,6 @@
 package org.gosky.mapping;
 
+import io.vertx.core.Future;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import org.apache.ibatis.annotations.Delete;
@@ -119,12 +120,14 @@ public class ServiceMethod {
 
         ParseSqlResult sqlResult = Parser.parse(sqlFactory.getSql(), sqlFactory.getMethod(), args);
         long start = System.currentTimeMillis();
-        CompletableFuture<Object> future = executor.query(sqlResult.getSql(), sqlResult.getValues()).thenApply(queryResult -> convert(queryResult));
-        future.thenAccept(o -> {
+        Future<Object> future = executor.query(sqlResult.getSql(), sqlResult.getValues()).map(rowSet -> convert(rowSet));
+        future.onComplete(o -> {
             logger.info("run sql={}, params={}, duration={}, result={}", sqlResult.getSql(),
                     sqlResult.getValues(), System.currentTimeMillis() - start,
                     o);
         });
+
+        //call只有一个就是defaultCall 返回的不同的那个是CallAdapter
         return callAdapter.adapt(new DefaultCall(future));
 
     }

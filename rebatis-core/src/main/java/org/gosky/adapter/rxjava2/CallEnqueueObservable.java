@@ -57,7 +57,7 @@ final class CallEnqueueObservable<T> extends Observable<T> {
 
     @Override public void dispose() {
       disposed = true;
-      call.cancel();
+//      call.cancel();
     }
 
     @Override public boolean isDisposed() {
@@ -91,7 +91,7 @@ final class CallEnqueueObservable<T> extends Observable<T> {
 
     @Override
     public void onFailure(Throwable t) {
-      if (call.isCanceled()) return;
+//      if (call.isCanceled()) return;
 
       try {
         observer.onError(t);
