@@ -10,7 +10,9 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlSchemaStatVisitor;
 import com.alibaba.druid.util.JdbcConstants;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.ibatis.reflection.MetaObject;
+import org.gosky.util.TypeUtil;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -27,66 +29,6 @@ import java.util.regex.Pattern;
 public class Parser {
 
     private static Pattern PARAM_PATTERN = Pattern.compile("(?<!\\\\)#\\{(.*)}");
-
-    private List<Class<?>> typeList = new ArrayList<Class<?>>() {{
-        add(String.class);
-
-        add(Byte.class);
-        add(Long.class);
-        add(Short.class);
-        add(Integer.class);
-        add(Integer.class);
-        add(Double.class);
-        add(Float.class);
-        add(Boolean.class);
-
-        add(Byte[].class);
-        add(Long[].class);
-        add(Short[].class);
-        add(Integer[].class);
-        add(Integer[].class);
-        add(Double[].class);
-        add(Float[].class);
-        add(Boolean[].class);
-
-        add(byte.class);
-        add(long.class);
-        add(short.class);
-        add(int.class);
-        add(int.class);
-        add(double.class);
-        add(float.class);
-        add(boolean.class);
-
-        add(byte[].class);
-        add(long[].class);
-        add(short[].class);
-        add(int[].class);
-        add(int[].class);
-        add(double[].class);
-        add(float[].class);
-        add(boolean[].class);
-
-        add(Date.class);
-        add(BigDecimal.class);
-        add(BigDecimal.class);
-        add(BigInteger.class);
-        add(Object.class);
-
-        add(Date[].class);
-        add(BigDecimal[].class);
-        add(BigDecimal[].class);
-        add(BigInteger[].class);
-        add(Object[].class);
-
-//        add(Map.class);
-//        add(HashMap.class);
-        add(List.class);
-        add(ArrayList.class);
-        add(Collection.class);
-        add(Iterator.class);
-    }};
-
 
     private static Parser INSTANCE = new Parser();
 
@@ -117,7 +59,7 @@ public class Parser {
         String sql1 = parser.parse(sqlBeforeParse);
         Map<String, Object> paramMapping = new LinkedHashMap<>();
         for (String name : mapping) {
-            if (typeList.contains(parameter.getClass())) {
+            if (TypeUtil.typeList.contains(parameter.getClass())) {
                 //单参数java基础类型
                 paramMapping.put(name, parameter);
             } else {

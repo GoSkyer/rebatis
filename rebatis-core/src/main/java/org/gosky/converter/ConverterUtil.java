@@ -6,6 +6,7 @@ import io.vertx.sqlclient.RowIterator;
 import io.vertx.sqlclient.RowSet;
 import lombok.extern.slf4j.Slf4j;
 import org.gosky.common.ReturnTypeEnum;
+import org.gosky.util.TypeUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -58,11 +59,15 @@ public class ConverterUtil {
             }
             List<Object> list = new ArrayList<>();
             rowSet.forEach(row -> {
-                JsonObject json = new JsonObject();
-                for (int i = 0; i < row.size(); i++) {
-                    json.getMap().put(row.getColumnName(i), row.getValue(i));
+                if (TypeUtil.typeList.contains(dataType)) {
+                    list.add(row.getValue(0));
+                } else {
+                    JsonObject json = new JsonObject();
+                    for (int i = 0; i < row.size(); i++) {
+                        json.getMap().put(row.getColumnName(i), row.getValue(i));
+                    }
+                    list.add(json.mapTo((Class) dataType));
                 }
-                list.add(json.mapTo((Class) dataType));
             });
 
             return list;
@@ -81,11 +86,15 @@ public class ConverterUtil {
             RowIterator<Row> iterator = rowSet.iterator();
             if (iterator.hasNext()) {
                 Row row = iterator.next();
-                JsonObject json = new JsonObject();
-                for (int i = 0; i < row.size(); i++) {
-                    json.getMap().put(row.getColumnName(i), row.getValue(i));
+                if (TypeUtil.typeList.contains(type)) {
+                    return row.getValue(0);
+                } else {
+                    JsonObject json = new JsonObject();
+                    for (int i = 0; i < row.size(); i++) {
+                        json.getMap().put(row.getColumnName(i), row.getValue(i));
+                    }
+                    return json.mapTo((Class) type);
                 }
-                json.mapTo((Class) type);
             }
         } else {
             //异常

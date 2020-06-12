@@ -20,8 +20,8 @@ import io.reactivex.Observable;
 @Mapper
 public interface TestMapper {
 
-    @Select("select * from user where name = #{user.name} and age = #{user.age} and sex = 1 limit #{limit}")
-    Call<List<User>> test(@Param("user") User user, @Param("limit") Integer limit);
+    @Select("select name from user where name = #{user.name} and age = #{user.age} and sex = 1 limit #{limit}")
+    Call<List<String>> test(@Param("user") User user, @Param("limit") Integer limit);
 
     @Insert("INSERT INTO user (username, password) VALUES ('test3', '12321233')")
     Call<Void> insert();
