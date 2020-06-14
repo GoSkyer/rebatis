@@ -11,7 +11,7 @@
     <modules>
         <module>rebatis-core</module>
         <module>rebatis-samples</module>
-<!--        <module>rebatis-processor</module>-->
+        <module>rebatis-processor</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,8 +20,23 @@
     </properties>
     <repositories>
         <repository>
+            <id>maven-ali</id>
+            <url>http://maven.aliyun.com/nexus/content/groups/public//</url>
+        </repository>
+        <repository>
             <id>jcenter</id>
             <url>https://jcenter.bintray.com/</url>
         </repository>
+
+        <repository>
+            <id>central-repos</id>
+            <url>https://repo.maven.apache.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>sonatype-repos</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+
+
     </repositories>
 </project>

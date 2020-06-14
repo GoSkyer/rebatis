@@ -1,13 +1,15 @@
 package org.gosky;
 
 import io.vertx.mysqlclient.MySQLPool;
-import lombok.extern.slf4j.Slf4j;
 import org.gosky.adapter.CallAdapter;
 import org.gosky.adapter.DefaultCallAdapterFactory;
+import org.gosky.common.BaseMapper;
 import org.gosky.converter.ConverterFactory;
 import org.gosky.executor.Executor;
 import org.gosky.executor.SimpleExecutor;
 import org.gosky.mapping.ServiceMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -22,15 +24,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Collections.unmodifiableList;
 import static org.gosky.util.Utils.checkNotNull;
 
-@Slf4j
 public class Rebatis {
 
-    public final Executor executor;
+    private static final Logger logger = LoggerFactory.getLogger(Rebatis.class);
+
+    public final SimpleExecutor executor;
     private final Map<Method, ServiceMethod> serviceMethodCache = new ConcurrentHashMap<>();
     public final ConverterFactory converterFactory;
     public final List<CallAdapter.Factory> callAdapterFactories;
 
-    private Rebatis(Executor executor, ConverterFactory converterFactory, List<CallAdapter.Factory> callAdapterFactories) {
+    private Rebatis(SimpleExecutor executor, ConverterFactory converterFactory, List<CallAdapter.Factory> callAdapterFactories) {
         this.executor = executor;
         this.converterFactory = converterFactory;
         this.callAdapterFactories = callAdapterFactories;
@@ -134,7 +137,7 @@ public class Rebatis {
 //            }
 
             if (callAdapterFactories.size() == 0) {
-                log.debug("callAdapterFactories size = 0, add default call");
+                logger.debug("callAdapterFactories size = 0, add default call");
                 callAdapterFactories.add(new DefaultCallAdapterFactory());
             }
 

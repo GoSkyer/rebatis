@@ -4,7 +4,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowIterator;
 import io.vertx.sqlclient.RowSet;
-import lombok.extern.slf4j.Slf4j;
 import org.gosky.common.ReturnTypeEnum;
 import org.gosky.util.TypeUtil;
 
@@ -21,7 +20,6 @@ import java.util.Map;
  * @Description:
  */
 
-@Slf4j
 public class ConverterUtil {
     private static ConverterUtil singleton;
 

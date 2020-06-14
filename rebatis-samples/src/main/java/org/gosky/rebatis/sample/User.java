@@ -1,14 +1,17 @@
 package org.gosky.rebatis.sample;
 
 
-import javax.persistence.Entity;
+import io.vertx.codegen.annotations.DataObject;
+
+import javax.persistence.Table;
 
 /**
  * @Auther: guozhong
  * @Date: 2019-04-01 11:21
  * @Description:
  */
-@Entity
+@Table
+@DataObject
 public class User {
 
     private Integer id;

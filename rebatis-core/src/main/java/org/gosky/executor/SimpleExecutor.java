@@ -1,6 +1,9 @@
 package org.gosky.executor;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
@@ -23,14 +26,17 @@ public class SimpleExecutor implements Executor {
 
     @Override
     public Future<RowSet<Row>> query(String sql, List<Object> values) {
-        Future<RowSet<Row>> future = Future.future();
+        Promise<RowSet<Row>> promise = Promise.promise();
         if (values != null && values.size() > 0) {
-            tConnectionPool.preparedQuery(sql).execute(Tuple.tuple(values), future);
+            tConnectionPool.preparedQuery(sql).execute(Tuple.tuple(values),  promise);
         } else {
-            tConnectionPool.query(sql).execute(future);
+            tConnectionPool.query(sql).execute(promise);
         }
-        return future;
+        return promise.future();
     }
 
+    public MySQLPool gettConnectionPool() {
+        return tConnectionPool;
+    }
 }
 

@@ -94,7 +94,7 @@ public class ServiceMethod {
         }
 
         //构建方法SQL映射
-        SqlFactory sqlFactory = SqlFactory.builder().methodName(method.getName())
+        SqlFactory sqlFactory = SqlFactory.SqlFactoryBuilder.aSqlFactory().methodName(method.getName())
                 .method(method)
                 .returnType(method.getGenericReturnType())
                 .responseType(dataContainerType)

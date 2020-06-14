@@ -1,15 +1,11 @@
 package org.gosky.rebatis.sample.mapper;
 
-import org.gosky.adapter.Call;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.gosky.adapter.Call;
 import org.gosky.rebatis.sample.User;
-
-import java.util.List;
-
-import io.reactivex.Observable;
 
 /**
  * @Auther: guozhong
@@ -21,7 +17,7 @@ import io.reactivex.Observable;
 public interface TestMapper {
 
     @Select("select name from user where name = #{user.name} and age = #{user.age} and sex = 1 limit #{limit}")
-    Call<List<String>> test(@Param("user") User user, @Param("limit") Integer limit);
+    Call<String> test(@Param("user") User user, @Param("limit") Integer limit);
 
     @Insert("INSERT INTO user (username, password) VALUES ('test3', '12321233')")
     Call<Void> insert();
