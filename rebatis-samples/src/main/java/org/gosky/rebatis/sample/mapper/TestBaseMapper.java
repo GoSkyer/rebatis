@@ -3,6 +3,7 @@ package org.gosky.rebatis.sample.mapper;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.templates.SqlTemplate;
+import org.apache.commons.lang3.StringUtils;
 import org.gosky.rebatis.sample.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,10 @@ public class TestBaseMapper extends org.gosky.common.BaseMapper {
     public Long insert(User user) {
         StringBuilder sql = new StringBuilder();
         sql.append("insert into user (");
+        if (user.getName() != null) {
+            sql.append("name, ");
+        }
+
 
 //        SqlTemplate.forUpdate(client,)
         return null;

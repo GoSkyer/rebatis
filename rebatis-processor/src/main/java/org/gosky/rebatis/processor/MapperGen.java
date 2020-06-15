@@ -60,6 +60,7 @@ public class MapperGen extends Generator<DataObjectModel> {
         StringWriter buffer = new StringWriter();
         PrintWriter writer = new PrintWriter(buffer);
         String visibility = model.isPublicConverter() ? "public" : "";
+        String tableName = model.getType().getSimpleName(SnakeCase.INSTANCE);
 
 //        formatter = getCase(model, "formatter");
 
@@ -67,6 +68,10 @@ public class MapperGen extends Generator<DataObjectModel> {
         writer.print("\n");
         writer.println("import org.slf4j.Logger;\n" +
                 "import org.slf4j.LoggerFactory;");
+        writer.println("import io.vertx.core.Handler;\n" +
+                "import io.vertx.mysqlclient.MySQLClient;\n" +
+                "import io.vertx.sqlclient.SqlResult;");
+        writer.print("import org.gosky.adapter.DefaultCall;\n");
         writer.print("/**\n");
         writer.print(" * Mapper for {@link " + model.getType().getSimpleName() + "}.\n");
         writer.print(" * NOTE: This class has been automatically generated from the {@link " + model.getType().getSimpleName() + "} original class using Vert.x codegen.\n");
@@ -80,7 +85,7 @@ public class MapperGen extends Generator<DataObjectModel> {
         writer.println("    org.gosky.adapter.Call<" + model.getType().getSimpleName() + "> selectByPrimaryKey(Long id) {");
         writer.println("        java.util.Map<String, Object> parameters = new java.util.HashMap<>();");
         writer.println("        parameters.put(\"id\", id);");
-        writer.println("        String template = \"select * from " + model.getType().getSimpleName(SnakeCase.INSTANCE) + " where id = #{id}\";");
+        writer.println("        String template = \"select * from " + tableName + " where id = #{id}\";");
         writer.println("        long start = System.currentTimeMillis();");
         writer.println("        io.vertx.core.Future<" + model.getType().getSimpleName() + "> execute = io.vertx.sqlclient.templates.SqlTemplate");
         writer.println("                .forQuery(client, template)");
@@ -98,15 +103,36 @@ public class MapperGen extends Generator<DataObjectModel> {
         writer.println("        return new org.gosky.adapter.DefaultCall(execute);");
         writer.println("}\n");
 
-        writer.println("    public Long insert(User user) {\n");
-//        model.getPropertyMap().forEach((s, propertyInfo) -> {
-//            propertyInfo.getV
-//        });
+        writer.println("    public DefaultCall<Long> insert(" + model.getType().getSimpleName() + " val) {\n");
+        writer.print("        StringBuilder sql = new StringBuilder();\n");
+        writer.print("        sql.append(\"insert into " + tableName + " (\");\n");
+        model.getPropertyMap().forEach((s, propertyInfo) -> {
+            writer.print("        if (val."+ propertyInfo.getGetterMethod() + "() != null) {\n");
+            writer.print("            sql.append(\"" + propertyInfo.getName() + ", \");\n");
+            writer.print("        }\n");
+        });
 //        writer.println("    @org.apache.ibatis.annotations.Insert(\"insert into user (id, name, age, sex) values (#{id}, #{name}, #{age}, #{sex} )\")");
+        writer.print("        sql.append(\") values (\");\n");
+        model.getPropertyMap().forEach((s, propertyInfo) -> {
+            writer.print("        if (val."+ propertyInfo.getGetterMethod() + "() != null) {\n");
+            writer.print("            sql.append(\"#{" + propertyInfo.getName() + "}, \");\n");
+            writer.print("        }\n");
+        });
+        writer.print("        sql.append(\");\");\n");
+        writer.println("        long start = System.currentTimeMillis();");
+        writer.print("        io.vertx.core.Future<Long> execute = io.vertx.sqlclient.templates.SqlTemplate\n" +
+                "                .forQuery(client, sql.toString())");
+        writer.print("                .mapFrom(" + model.getType().getSimpleName() + ".class)\n");
+        writer.print("                .execute(val)\n" +
+                "                .map(rowSet -> rowSet.property(MySQLClient.LAST_INSERTED_ID))\n" +
+                "                .onComplete(event -> logger.info(\"run sql={}, params={}, duration={}, result={}\", sql, val, System.currentTimeMillis() - start, event.result()));\n");
+        writer.print("        return new org.gosky.adapter.DefaultCall(execute);\n");
+        writer.print("    }\n");
+
+
         writer.print("}\n");
         return buffer.toString();
     }
-
 
 
     private String Camel2Snake(String camelCae) {
