@@ -1,8 +1,5 @@
 package org.gosky.rebatis.sample;
 
-
-import io.vertx.codegen.annotations.DataObject;
-
 import javax.persistence.Table;
 
 /**
@@ -11,7 +8,6 @@ import javax.persistence.Table;
  * @Description:
  */
 @Table
-@DataObject
 public class User {
 
     private Integer id;

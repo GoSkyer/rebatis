@@ -53,4 +53,17 @@ public class TestBaseMapper extends org.gosky.common.BaseMapper {
 //        SqlTemplate.forUpdate(client,)
         return null;
     }
+
+
+    public Long update(User user) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("update user ");
+        if (user.getName() != null) {
+            sql.append("set name = #{name},");
+        }
+
+
+//        SqlTemplate.forUpdate(client,)
+        return null;
+    }
 }
