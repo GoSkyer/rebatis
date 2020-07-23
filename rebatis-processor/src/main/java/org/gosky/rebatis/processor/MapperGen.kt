@@ -242,6 +242,39 @@ class MapperGen : AbstractProcessor() {
 """)
         writer.print("        return new org.gosky.adapter.DefaultCall(execute);\n")
         writer.print("    }\n")
+
+        //templateOne
+        writer.println("    org.gosky.adapter.Call<" + model.type.simpleName + """> templateOne(${model.type.simpleName} _m) {""")
+        writer.print("        StringBuilder sql = new StringBuilder();\n")
+        writer.println("""        sql.append("select * from $tableName where 1=1 ");""")
+        model.propertyMap.values.forEachIndexed { index, propertyInfo ->
+            writer.print("""        if (_m.${propertyInfo.getterMethod}() != null) {
+""")
+            writer.print("""            sql.append("and ${propertyInfo.name} = #{${propertyInfo.name}} ");
+""")
+            writer.print("        }\n")
+        }
+        writer.println("""        sql.append(" limit 1;");""")
+        writer.println("        long start = System.currentTimeMillis();")
+        writer.println("        io.vertx.core.Future<" + model.type.simpleName + "> execute = io.vertx.sqlclient.templates.SqlTemplate")
+        writer.println("                .forQuery(client, sql.toString())")
+        writer.println("                .mapTo(" + model.type.simpleName + ".class)")
+        writer.print("""                .mapFrom(${model.type.simpleName}.class)
+""")
+        writer.println("                .execute(_m)")
+        writer.println("                .map(users -> {")
+        writer.println("                    io.vertx.sqlclient.RowIterator<" + model.type.simpleName + "> iterator = users.iterator();")
+        writer.println("""                    if (iterator.hasNext()) {
+                        return iterator.next();
+                    } else {
+                        return null;
+                    }
+                })""")
+        writer.println("""                                .onSuccess(event -> logger.info("run sql success={}, params={}, duration={}, result={}", sql, _m, System.currentTimeMillis() - start, event.toString()))
+                .onFailure(throwable -> logger.error("run sql failure={}, params={}, duration={}", sql, _m, System.currentTimeMillis() - start, throwable));""")
+        writer.println("        return new org.gosky.adapter.DefaultCall(execute);")
+        writer.println("}\n")
+
         writer.print("}\n")
         return buffer.toString()
     }
