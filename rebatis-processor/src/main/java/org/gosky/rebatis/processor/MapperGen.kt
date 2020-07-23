@@ -82,6 +82,7 @@ class MapperGen : AbstractProcessor() {
                         }
                     }
                 }
+
         return true
     }
 
