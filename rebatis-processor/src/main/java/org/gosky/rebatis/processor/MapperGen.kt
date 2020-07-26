@@ -103,7 +103,13 @@ class MapperGen : AbstractProcessor() {
     }
 
     private fun genSimpleName(model: TableModel): String {
-        return model.type.simpleName + "BaseMapper"
+        var tableName = model.annotations[0].getMember("name").toString()
+        if (StringUtils.isEmpty(tableName)) {
+            tableName = model.type.getSimpleName(CamelCase.INSTANCE)
+        } else {
+            tableName = snake2Camel(tableName)
+        }
+        return tableName+ "BaseMapper"
     }
 
     private val formatter: Case? = null
@@ -143,7 +149,7 @@ class MapperGen : AbstractProcessor() {
         writer.println("    public " + genSimpleName(model) + " (org.gosky.Rebatis rebatis) {")
         writer.println("        super(rebatis);")
         writer.println("    }\n")
-        writer.println("    org.gosky.adapter.Call<" + model.type.simpleName + "> selectByPrimaryKey(Long id) {")
+        writer.println("   public org.gosky.adapter.Call<" + model.type.simpleName + "> selectByPrimaryKey(Long id) {")
         writer.println("        java.util.Map<String, Object> parameters = new java.util.HashMap<>();")
         writer.println("        parameters.put(\"id\", id);")
         writer.println("        String template = \"select * from $tableName where id = #{id}\";")
@@ -280,9 +286,14 @@ class MapperGen : AbstractProcessor() {
         return buffer.toString()
     }
 
-    private fun Camel2Snake(camelCae: String): String {
+    private fun camel2Snake(camelCae: String): String {
         val atoms = CamelCase.INSTANCE.parse(camelCae)
         return SnakeCase.INSTANCE.format(atoms)
+    }
+
+    private fun snake2Camel(camelCae: String): String {
+        val atoms = SnakeCase.INSTANCE.parse(camelCae)
+        return CamelCase.INSTANCE.format(atoms)
     }
 
     private fun getCase(model: DataObjectModel, name: String): Case {
