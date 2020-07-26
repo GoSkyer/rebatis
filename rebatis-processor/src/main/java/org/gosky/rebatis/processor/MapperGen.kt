@@ -142,13 +142,14 @@ class MapperGen : AbstractProcessor() {
         writer.print(""" * NOTE: This class has been automatically generated from the {@link ${model.type.simpleName}} original class using Vert.x codegen.
 """)
         writer.print(" */\n")
-        //selectById
         writer.print("""public class ${genSimpleName(model)} extends org.gosky.common.BaseMapper {
 """)
         writer.println("    private Logger logger = LoggerFactory.getLogger(org.gosky.common.BaseMapper.class);")
         writer.println("    public " + genSimpleName(model) + " (org.gosky.Rebatis rebatis) {")
         writer.println("        super(rebatis);")
         writer.println("    }\n")
+
+        //selectById
         writer.println("   public org.gosky.adapter.Call<" + model.type.simpleName + "> selectByPrimaryKey(Long id) {")
         writer.println("        java.util.Map<String, Object> parameters = new java.util.HashMap<>();")
         writer.println("        parameters.put(\"id\", id);")
@@ -281,6 +282,25 @@ class MapperGen : AbstractProcessor() {
                 .onFailure(throwable -> logger.error("run sql failure={}, params={}, duration={}", sql, _m, System.currentTimeMillis() - start, throwable));""")
         writer.println("        return new org.gosky.adapter.DefaultCall(execute);")
         writer.println("}\n")
+
+        //delete
+        writer.println("""    public DefaultCall<Long> delete(Long id) {
+""")
+        writer.print("        StringBuilder sql = new StringBuilder();\n")
+        writer.print("""        sql.append("delete from $tableName where id = #{id}");
+""")
+        writer.println("        java.util.Map<String, Object> parameters = new java.util.HashMap<>();")
+        writer.println("        parameters.put(\"id\", id);")
+        writer.println("        long start = System.currentTimeMillis();")
+        writer.print("""        io.vertx.core.Future<Long> execute = io.vertx.sqlclient.templates.SqlTemplate
+                .forQuery(client, sql.toString())""")
+        writer.print("""                .execute(parameters)
+                .map(rowSet -> rowSet.property(MySQLClient.LAST_INSERTED_ID))
+                .onSuccess(event -> logger.info("run sql success={}, params={}, duration={}, result={}", sql, id, System.currentTimeMillis() - start, event.toString()))
+                .onFailure(throwable -> logger.error("run sql failure={}, params={}, duration={}", sql, id, System.currentTimeMillis() - start, throwable));
+""")
+        writer.print("        return new org.gosky.adapter.DefaultCall(execute);\n")
+        writer.print("    }\n")
 
         writer.print("}\n")
         return buffer.toString()
