@@ -245,7 +245,7 @@ class MapperGen : AbstractProcessor() {
 """)
         writer.print("""                .execute(val)
                 .map(rowSet -> rowSet.property(MySQLClient.LAST_INSERTED_ID))
-                .onSuccess(event -> logger.info("run sql success={}, params={}, duration={}, result={}", sql, val, System.currentTimeMillis() - start, event.toString()))
+                .onSuccess(event -> logger.info("run sql success={}, params={}, duration={}, result={}", sql, val, System.currentTimeMillis() - start, event.result()))
                 .onFailure(throwable -> logger.error("run sql failure={}, params={}, duration={}", sql, val, System.currentTimeMillis() - start, throwable));
 """)
         writer.print("        return new org.gosky.adapter.DefaultCall(execute);\n")
@@ -278,7 +278,7 @@ class MapperGen : AbstractProcessor() {
                         return null;
                     }
                 })""")
-        writer.println("""                                .onSuccess(event -> logger.info("run sql success={}, params={}, duration={}, result={}", sql, _m, System.currentTimeMillis() - start, event.toString()))
+        writer.println("""                                .onSuccess(event -> logger.info("run sql success={}, params={}, duration={}, result={}", sql, _m, System.currentTimeMillis() - start, event.result()))
                 .onFailure(throwable -> logger.error("run sql failure={}, params={}, duration={}", sql, _m, System.currentTimeMillis() - start, throwable));""")
         writer.println("        return new org.gosky.adapter.DefaultCall(execute);")
         writer.println("}\n")
@@ -296,7 +296,7 @@ class MapperGen : AbstractProcessor() {
                 .forQuery(client, sql.toString())""")
         writer.print("""                .execute(parameters)
                 .map(rowSet -> rowSet.property(MySQLClient.LAST_INSERTED_ID))
-                .onSuccess(event -> logger.info("run sql success={}, params={}, duration={}, result={}", sql, id, System.currentTimeMillis() - start, event.toString()))
+                .onSuccess(event -> logger.info("run sql success={}, params={}, duration={}, result={}", sql, id, System.currentTimeMillis() - start, event.result()))
                 .onFailure(throwable -> logger.error("run sql failure={}, params={}, duration={}", sql, id, System.currentTimeMillis() - start, throwable));
 """)
         writer.print("        return new org.gosky.adapter.DefaultCall(execute);\n")
