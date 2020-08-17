@@ -10,6 +10,7 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlSchemaStatVisitor;
 import com.alibaba.druid.util.JdbcConstants;
+import kotlin.Pair;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.ibatis.reflection.MetaObject;
 import org.gosky.util.TypeUtil;
@@ -21,6 +22,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author: Galaxy
@@ -57,15 +59,18 @@ public class Parser {
         });
         //往mapping中添加值
         String sql1 = parser.parse(sqlBeforeParse);
-        Map<String, Object> paramMapping = new IdentityHashMap<>();
+        List<Pair<String, Object>> paramMappingList = new ArrayList<>();
+        Map<String, Object> paramMapping = new LinkedHashMap<>();
         for (String name : mapping) {
             if (TypeUtil.typeList.contains(parameter.getClass())) {
                 //单参数java基础类型
                 paramMapping.put(name, parameter);
+                paramMappingList.add(new Pair<>(name, parameter));
             } else {
                 //pojo或者map
                 Object value = MetaObject.forObject(parameter).getValue(name);
                 paramMapping.put(name, value);
+                paramMappingList.add(new Pair<>(name, value));
             }
         }
 
@@ -88,6 +93,8 @@ public class Parser {
                                 if (paramMapping.containsKey(right) && value == null) {
                                     ((SQLSelectQueryBlock) query).removeCondition((sqlExpr));
                                     paramMapping.remove(right);
+                                    String finalRight = right;
+                                    paramMappingList = paramMappingList.stream().filter(t -> t.getFirst().equals(finalRight)).collect(Collectors.toList());
                                 }
                             }
                         }
@@ -98,7 +105,7 @@ public class Parser {
                 String sql2 = parser2.parse(SQLUtils.toMySqlString(query,
                         new SQLUtils.FormatOption(false, false)));
                 return new ParseSqlResult(sql2,
-                        new ArrayList<>(paramMapping.values()));
+                        paramMappingList.stream().map(Pair::getSecond).collect(Collectors.toList()));
             }
         }
 
