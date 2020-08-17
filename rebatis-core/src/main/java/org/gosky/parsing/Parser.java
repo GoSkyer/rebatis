@@ -28,18 +28,18 @@ import java.util.regex.Pattern;
  **/
 public class Parser {
 
-    private static Pattern PARAM_PATTERN = Pattern.compile("(?<!\\\\)#\\{(.*)}");
+    private static final Pattern PARAM_PATTERN = Pattern.compile("(?<!\\\\)#\\{(.*)}");
 
-    private static Parser INSTANCE = new Parser();
+    private static final Parser INSTANCE = new Parser();
 
-    public static ParseSqlResult parse(String sqlBeforeParse, Method method, Object[] args) throws Exception {
+    public static ParseSqlResult parse(String sqlBeforeParse, Method method, Object[] args) {
 
         if (args == null || args.length == 0) return new ParseSqlResult(sqlBeforeParse);
 
         return INSTANCE.parserSqlWithParameters(sqlBeforeParse, method, args);
     }
 
-    private ParseSqlResult parserSqlWithParameters(String sqlBeforeParse, Method method, Object[] args) throws Exception {
+    private ParseSqlResult parserSqlWithParameters(String sqlBeforeParse, Method method, Object[] args) {
 
         Parameter[] parameters = method.getParameters();
 
@@ -57,7 +57,7 @@ public class Parser {
         });
         //往mapping中添加值
         String sql1 = parser.parse(sqlBeforeParse);
-        Map<String, Object> paramMapping = new LinkedHashMap<>();
+        Map<String, Object> paramMapping = new IdentityHashMap<>();
         for (String name : mapping) {
             if (TypeUtil.typeList.contains(parameter.getClass())) {
                 //单参数java基础类型
