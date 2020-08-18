@@ -94,7 +94,7 @@ public class Parser {
                                     ((SQLSelectQueryBlock) query).removeCondition((sqlExpr));
                                     paramMapping.remove(right);
                                     String finalRight = right;
-                                    paramMappingList = paramMappingList.stream().filter(t -> t.getFirst().equals(finalRight)).collect(Collectors.toList());
+                                    paramMappingList = paramMappingList.stream().filter(t -> !t.getFirst().equals(finalRight)).collect(Collectors.toList());
                                 }
                             }
                         }
