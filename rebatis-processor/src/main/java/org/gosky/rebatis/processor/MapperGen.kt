@@ -54,6 +54,10 @@ class MapperGen : AbstractProcessor() {
     }
 
     override fun process(annotations: Set<TypeElement>, round: RoundEnvironment): Boolean {
+        if (round.processingOver()) {
+            return true
+        }
+
         round.getElementsAnnotatedWith(Table::class.java)
                 .stream()
                 .filter { elt: Element? -> elt is TypeElement }
@@ -109,7 +113,7 @@ class MapperGen : AbstractProcessor() {
         } else {
             tableName = snake2Camel(tableName)
         }
-        return tableName+ "BaseMapper"
+        return tableName + "BaseMapper"
     }
 
     private val formatter: Case? = null
