@@ -54,19 +54,19 @@ public class Rebatis {
                             return method.invoke(this, args);
                         }
 
-                        return loadServiceMethod(method).invoke(args);
+                        return loadServiceMethod(mapper, method).invoke(args);
                     }
                 });
     }
 
-    private ServiceMethod loadServiceMethod(Method method) {
+    private ServiceMethod loadServiceMethod(Class<?> mapper, Method method) {
         ServiceMethod result = serviceMethodCache.get(method);
         if (result != null) return result;
 
         synchronized (serviceMethodCache) {
             result = serviceMethodCache.get(method);
             if (result == null) {
-                result = ServiceMethod.parseAnnotations(this, method);
+                result = ServiceMethod.parseAnnotations(this, mapper, method);
                 serviceMethodCache.put(method, result);
             }
         }

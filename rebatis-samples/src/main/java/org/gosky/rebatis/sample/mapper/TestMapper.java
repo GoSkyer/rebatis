@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.gosky.adapter.Call;
+import org.gosky.basemapper.BaseMapper;
 import org.gosky.rebatis.sample.User;
 
 /**
@@ -14,7 +15,7 @@ import org.gosky.rebatis.sample.User;
  */
 
 @Mapper
-public interface TestMapper {
+public interface TestMapper extends BaseMapper<User> {
 
     @Select("select name from user where name = #{user.name} and age = #{user.age} and sex = 1 limit #{limit}")
     Call<String> test(@Param("user") User user, @Param("limit") Integer limit);

@@ -66,19 +66,19 @@ class MapperGen : AbstractProcessor() {
                     val model = MODEL_PROVIDER.getModel(processingEnv, tmf, te) as TableModel
                     if (model != null) {
                         model.process()
-                        processingEnv.messager.printMessage(Diagnostic.Kind.NOTE, "anno=" + model.annotations[0].getMember("name"))
+                        processingEnv.messager.printMessage(Diagnostic.Kind.NOTE, "anno=" + model.annotations[0].getMember("name") + "\n")
                         val content = render(model)
                         if (content.length > 0) {
                             try {
-                                val target = processingEnv.filer.createSourceFile(model.type.packageName + "." + genSimpleName(model))
+                                val target = processingEnv.filer.createSourceFile(model.type.packageName + "." + genSimpleName(model) + "\n")
                                 try {
                                     target.openWriter().use { writer ->
                                         writer.write(content)
-                                        processingEnv.messager.printMessage(Diagnostic.Kind.NOTE, "Generated model " + model.fqn)
+                                        processingEnv.messager.printMessage(Diagnostic.Kind.NOTE, "Generated model " + model.fqn + "\n")
                                     }
                                 } catch (e: IOException) {
                                     e.printStackTrace()
-                                    processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "Generated model error:" + e.message)
+                                    processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "Generated model error:" + e.message + "\n")
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
