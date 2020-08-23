@@ -10,7 +10,7 @@ public class BaseMapperProvider extends MapperTemplate {
         //获取全部列
         Set<EntityColumn> columnList = EntityHelper.getColumns(entityClass);
 //        EntityColumn logicDeleteColumn = SqlHelper.getLogicDeleteColumn(entityClass);
-        processKey(sql, entityClass, ms, columnList);
+//        processKey(sql, entityClass, ms, columnList);
         sql.append(SqlHelper.insertIntoTable(entityClass, tableName(entityClass)));
         sql.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
         for (EntityColumn column : columnList) {
