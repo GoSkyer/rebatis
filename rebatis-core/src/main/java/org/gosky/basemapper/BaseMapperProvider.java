@@ -4,7 +4,7 @@ import java.util.Set;
 
 public class BaseMapperProvider extends MapperTemplate {
 
-    public String selectOne(Class<?> mapper) {
+    public String insert(Class<?> mapper) {
         Class<?> entityClass = getEntityClass(mapper);
         StringBuilder sql = new StringBuilder();
         //获取全部列
@@ -12,22 +12,11 @@ public class BaseMapperProvider extends MapperTemplate {
 //        EntityColumn logicDeleteColumn = SqlHelper.getLogicDeleteColumn(entityClass);
 //        processKey(sql, entityClass, ms, columnList);
         sql.append(SqlHelper.insertIntoTable(entityClass, tableName(entityClass)));
-        sql.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
-        for (EntityColumn column : columnList) {
-            if (!column.isInsertable()) {
-                continue;
-            }
-            if (column.isIdentity()) {
-                sql.append(column.getColumn()).append(",");
-            } else {
-                if (logicDeleteColumn != null && logicDeleteColumn == column) {
-                    sql.append(column.getColumn()).append(",");
-                    continue;
-                }
-                sql.append(SqlHelper.getIfNotNull(column, column.getColumn() + ",", isNotEmpty()));
-            }
+//        sql.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
+        for (EntityColumn column : columnList) {`
+            sql.append(SqlHelper.getIfNotNull(column, column.getColumn() + ",", isNotEmpty()));
         }
-        sql.append("</trim>");
+//        sql.append("</trim>");
 
         sql.append("<trim prefix=\"VALUES(\" suffix=\")\" suffixOverrides=\",\">");
         for (EntityColumn column : columnList) {
@@ -53,6 +42,7 @@ public class BaseMapperProvider extends MapperTemplate {
             }
         }
         sql.append("</trim>");
-        return sql.toString();    }
+        return sql.toString();
+    }
 
 }

@@ -25,6 +25,8 @@
 package org.gosky.basemapper;
 
 
+import org.gosky.util.MapperStringUtil;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -54,6 +56,17 @@ public abstract class MapperTemplate {
                 }
             }
         throw new MapperException("无法获取 " + mapper + " 方法的泛型信息!");
+    }
+
+    /**
+     * 获取实体类的表名
+     *
+     * @param entityClass
+     * @return
+     */
+    protected String tableName(Class<?> entityClass) {
+        EntityTable entityTable = EntityHelper.getEntityTable(entityClass);
+        return entityTable.getName();
     }
 
 }
