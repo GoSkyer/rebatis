@@ -25,6 +25,9 @@
 package org.gosky.basemapper;
 
 
+import io.netty.util.internal.StringUtil;
+import org.gosky.util.MapperStringUtil;
+
 /**
  * 数据库表对应的列
  *
@@ -52,6 +55,32 @@ public class EntityColumn {
 
 
     public EntityColumn() {
+    }
+
+    /**
+     * 返回格式如:#{entityName.age+suffix,jdbcType=NUMERIC,typeHandler=MyTypeHandler}+separator
+     *
+     * @param entityName
+     * @param suffix
+     * @param separator
+     * @return
+     */
+    public String getColumnHolder(String entityName, String suffix, String separator) {
+        StringBuffer sb = new StringBuffer("#{");
+        if (MapperStringUtil.isNotEmpty(entityName)) {
+            sb.append(entityName);
+            sb.append(".");
+        }
+        sb.append(this.property);
+        if (MapperStringUtil.isNotEmpty(suffix)) {
+            sb.append(suffix);
+        }
+
+        sb.append("}");
+        if (MapperStringUtil.isNotEmpty(separator)) {
+            sb.append(separator);
+        }
+        return sb.toString();
     }
 
     public EntityColumn(EntityTable table) {

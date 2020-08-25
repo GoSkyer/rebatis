@@ -146,7 +146,8 @@ public class ServiceMethod {
             if (sqlFactory.isBaseMethod()) {
                 //调用SqlProvider的方法获取sql
                 String sql = invokeProviderMethod(sqlFactory.getProviderClass(), sqlFactory.getProviderMethod(), mapper, metaObject);
-
+                logger.info("base mapper sql={}", sql);
+                sqlFactory.setSql(sql);
             }
 
             //解析sql

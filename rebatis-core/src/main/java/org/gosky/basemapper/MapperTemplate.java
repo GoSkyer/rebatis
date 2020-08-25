@@ -25,15 +25,18 @@
 package org.gosky.basemapper;
 
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.reflection.MetaObject;
 import org.gosky.util.MapperStringUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * 通用Mapper模板类，扩展通用Mapper时需要继承该类
- *
- * */
+ */
 public abstract class MapperTemplate {
 
 
@@ -44,17 +47,17 @@ public abstract class MapperTemplate {
      */
     public Class<?> getEntityClass(Class<?> mapper) {
 
-            Type[] types = mapper.getGenericInterfaces();
-            for (Type type : types) {
-                if (type instanceof ParameterizedType) {
-                    ParameterizedType t = (ParameterizedType) type;
-                        Class<?> returnType = (Class<?>) t.getActualTypeArguments()[0];
-                        //获取该类型后，第一次对该类型进行初始化
-                        EntityHelper.initEntityNameMap(returnType);
+        Type[] types = mapper.getGenericInterfaces();
+        for (Type type : types) {
+            if (type instanceof ParameterizedType) {
+                ParameterizedType t = (ParameterizedType) type;
+                Class<?> returnType = (Class<?>) t.getActualTypeArguments()[0];
+                //获取该类型后，第一次对该类型进行初始化
+                EntityHelper.initEntityNameMap(returnType);
 //                        entityClassMap.put(msId, returnType);
-                        return returnType;
-                }
+                return returnType;
             }
+        }
         throw new MapperException("无法获取 " + mapper + " 方法的泛型信息!");
     }
 
@@ -69,4 +72,18 @@ public abstract class MapperTemplate {
         return entityTable.getName();
     }
 
+    protected String trim(Function<StringBuilder, String> func) {
+        StringBuilder sql = new StringBuilder();
+        String apply = func.apply(sql);
+        return StringUtils.strip(apply,",");
+    }
+
+
+    protected String trimInFor(Set<EntityColumn> columnList, MetaObject metaObject) {
+        StringBuilder sql = new StringBuilder();
+        for (EntityColumn column : columnList) {
+            sql.append(SqlHelper.getIfNotNull(column, column.getProperty() + ",", metaObject));
+        }
+        return sql.toString();
+    }
 }

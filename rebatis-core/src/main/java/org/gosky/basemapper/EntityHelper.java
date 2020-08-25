@@ -85,7 +85,7 @@ public class EntityHelper {
             entityTable.setName(tableName);
         }
         entityTable.setEntityClassColumns(new LinkedHashSet<EntityColumn>());
-//        entityTable.setEntityClassPKColumns(new LinkedHashSet<EntityColumn>());
+        entityTable.setEntityClassPKColumns(new LinkedHashSet<EntityColumn>());
         //处理所有列
         List<EntityField> fields = null;
 
@@ -94,7 +94,9 @@ public class EntityHelper {
             //如果启用了简单类型，就做简单类型校验，如果不是简单类型，直接跳过
             //3.5.0 如果启用了枚举作为简单类型，就不会自动忽略枚举类型
             //4.0 如果标记了 Column 或 ColumnType 注解，也不忽略
-            if (SimpleTypeUtil.isSimpleType(field.getJavaType())) {
+
+            //只处理简单类型
+            if (!SimpleTypeUtil.isSimpleType(field.getJavaType())) {
                 continue;
             }
             processField(entityTable, field);

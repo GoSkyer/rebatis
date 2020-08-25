@@ -56,9 +56,9 @@ public class SqlHelper {
      * @param metaObject
      * @return
      */
-    public static String getIfNotNull(EntityColumn column, MetaObject metaObject) {
+    public static String getIfNotNull(EntityColumn column, String contents, MetaObject metaObject) {
         if (metaObject.getValue(column.getProperty()) != null) {
-            return column + ",";
+            return contents;
         } else {
             return "";
         }

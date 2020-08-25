@@ -1,6 +1,7 @@
 package org.gosky.basemapper;
 
 import org.apache.ibatis.annotations.SelectProvider;
+import org.gosky.adapter.Call;
 
 public interface BaseMapper<T> {
 
@@ -10,7 +11,7 @@ public interface BaseMapper<T> {
      * @param record
      * @return
      */
-    @SelectProvider(value = BaseMapperProvider.class, method = "selectOne")
-    T selectOne(T record);
+    @SelectProvider(value = BaseMapperProvider.class, method = "insert")
+    Call<T> insert(T record);
 
 }
