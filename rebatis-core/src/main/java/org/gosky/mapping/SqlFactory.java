@@ -20,9 +20,12 @@ public class SqlFactory {
     private Type responseType;
     private Class<?>[] parameterTypes;
     private ReturnTypeEnum returnTypeEnum;
-
     //
     private Method method;
+    //是否是baseMapper的方法
+    private boolean isBaseMethod = false;
+    private Class<?> providerClass;
+    private Method providerMethod;
 
 
     public String getMethodName() {
@@ -89,7 +92,29 @@ public class SqlFactory {
         this.method = method;
     }
 
+    public boolean isBaseMethod() {
+        return isBaseMethod;
+    }
 
+    public void setBaseMethod(boolean baseMethod) {
+        isBaseMethod = baseMethod;
+    }
+
+    public Class<?> getProviderClass() {
+        return providerClass;
+    }
+
+    public void setProviderClass(Class<?> providerClass) {
+        this.providerClass = providerClass;
+    }
+
+    public Method getProviderMethod() {
+        return providerMethod;
+    }
+
+    public void setProviderMethod(Method providerMethod) {
+        this.providerMethod = providerMethod;
+    }
 
     @Override
     public String toString() {
@@ -102,79 +127,9 @@ public class SqlFactory {
                 ", parameterTypes=" + Arrays.toString(parameterTypes) +
                 ", returnTypeEnum=" + returnTypeEnum +
                 ", method=" + method +
+                ", isBaseMethod=" + isBaseMethod +
+                ", providerClass=" + providerClass +
+                ", providerMethod=" + providerMethod +
                 '}';
-    }
-
-    public static final class SqlFactoryBuilder {
-        private String methodName;
-        private String sql;
-        private SQLType sqlType;
-        private Type returnType;
-        //    private Type adapterType;
-        private Type responseType;
-        private Class<?>[] parameterTypes;
-        private ReturnTypeEnum returnTypeEnum;
-        //
-        private Method method;
-
-        private SqlFactoryBuilder() {
-        }
-
-        public static SqlFactoryBuilder aSqlFactory() {
-            return new SqlFactoryBuilder();
-        }
-
-        public SqlFactoryBuilder methodName(String methodName) {
-            this.methodName = methodName;
-            return this;
-        }
-
-        public SqlFactoryBuilder sql(String sql) {
-            this.sql = sql;
-            return this;
-        }
-
-        public SqlFactoryBuilder sqlType(SQLType sqlType) {
-            this.sqlType = sqlType;
-            return this;
-        }
-
-        public SqlFactoryBuilder returnType(Type returnType) {
-            this.returnType = returnType;
-            return this;
-        }
-
-        public SqlFactoryBuilder responseType(Type responseType) {
-            this.responseType = responseType;
-            return this;
-        }
-
-        public SqlFactoryBuilder parameterTypes(Class<?>[] parameterTypes) {
-            this.parameterTypes = parameterTypes;
-            return this;
-        }
-
-        public SqlFactoryBuilder returnTypeEnum(ReturnTypeEnum returnTypeEnum) {
-            this.returnTypeEnum = returnTypeEnum;
-            return this;
-        }
-
-        public SqlFactoryBuilder method(Method method) {
-            this.method = method;
-            return this;
-        }
-
-        public SqlFactory build() {
-            SqlFactory sqlFactory = new SqlFactory();
-            sqlFactory.setMethodName(methodName);
-            sqlFactory.setSql(sql);
-            sqlFactory.setSqlType(sqlType);
-            sqlFactory.setReturnType(returnType);
-            sqlFactory.setResponseType(responseType);
-            sqlFactory.setParameterTypes(parameterTypes);
-            sqlFactory.setReturnTypeEnum(returnTypeEnum);
-            sqlFactory.setMethod(method);
-            return sqlFactory;
-        }
     }
 }

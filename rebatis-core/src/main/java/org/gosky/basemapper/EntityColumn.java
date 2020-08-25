@@ -31,11 +31,19 @@ package org.gosky.basemapper;
  * @author liuzh
  */
 public class EntityColumn {
+    /**
+     * 所属的table
+     */
     private EntityTable table;
+    /**
+     * java对象的fieldName
+     */
     private String property;
+    /**
+     * 数据库字段名
+     */
     private String column;
     private Class<?> javaType;
-
 
     /**
      * 对应的字段信息

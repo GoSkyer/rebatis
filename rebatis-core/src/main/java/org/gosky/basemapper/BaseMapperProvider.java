@@ -1,10 +1,12 @@
 package org.gosky.basemapper;
 
+import org.apache.ibatis.reflection.MetaObject;
+
 import java.util.Set;
 
 public class BaseMapperProvider extends MapperTemplate {
 
-    public String insert(Class<?> mapper) {
+    public String insert(Class<?> mapper, MetaObject metaObject) {
         Class<?> entityClass = getEntityClass(mapper);
         StringBuilder sql = new StringBuilder();
         //获取全部列
@@ -13,12 +15,12 @@ public class BaseMapperProvider extends MapperTemplate {
 //        processKey(sql, entityClass, ms, columnList);
         sql.append(SqlHelper.insertIntoTable(entityClass, tableName(entityClass)));
 //        sql.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
-        for (EntityColumn column : columnList) {`
-            sql.append(SqlHelper.getIfNotNull(column, column.getColumn() + ",", isNotEmpty()));
+        for (EntityColumn column : columnList) {
+            sql.append(SqlHelper.getIfNotNull(column, metaObject));
         }
 //        sql.append("</trim>");
 
-        sql.append("<trim prefix=\"VALUES(\" suffix=\")\" suffixOverrides=\",\">");
+        sql.append(") VALUES( ");
         for (EntityColumn column : columnList) {
             if (!column.isInsertable()) {
                 continue;
@@ -41,7 +43,7 @@ public class BaseMapperProvider extends MapperTemplate {
                 sql.append(SqlHelper.getIfCacheIsNull(column, column.getColumnHolder() + ","));
             }
         }
-        sql.append("</trim>");
+        sql.append(");");
         return sql.toString();
     }
 

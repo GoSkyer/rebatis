@@ -25,7 +25,7 @@
 package org.gosky.basemapper;
 
 
-import java.util.Set;
+import org.apache.ibatis.reflection.MetaObject;
 
 /**
  * 拼常用SQL的工具类
@@ -45,8 +45,23 @@ public class SqlHelper {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO ");
         sql.append(defaultTableName);
-        sql.append(" ");
+        sql.append(" (");
         return sql.toString();
+    }
+
+    /**
+     * 判断自动!=null的条件结构
+     *
+     * @param column
+     * @param metaObject
+     * @return
+     */
+    public static String getIfNotNull(EntityColumn column, MetaObject metaObject) {
+        if (metaObject.getValue(column.getProperty()) != null) {
+            return column + ",";
+        } else {
+            return "";
+        }
     }
 
 }

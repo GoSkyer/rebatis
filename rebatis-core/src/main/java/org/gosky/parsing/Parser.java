@@ -2,23 +2,18 @@ package org.gosky.parsing;
 
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.SQLObject;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQuery;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
-import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlSchemaStatVisitor;
 import com.alibaba.druid.util.JdbcConstants;
+import jdk.nashorn.internal.ir.LiteralNode;
 import kotlin.Pair;
-import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.ibatis.reflection.MetaObject;
-import org.gosky.util.TypeUtil;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,22 +29,22 @@ public class Parser {
 
     private static final Parser INSTANCE = new Parser();
 
-    public static ParseSqlResult parse(String sqlBeforeParse, Method method, Object[] args) {
+    public static ParseSqlResult parse(String sqlBeforeParse, Method method, Object[] args, boolean isSimpleType, Object parameter, MetaObject metaObject) {
 
-        if (args == null || args.length == 0) return new ParseSqlResult(sqlBeforeParse);
+//        if (args == null || args.length == 0) return new ParseSqlResult(sqlBeforeParse);
 
-        return INSTANCE.parserSqlWithParameters(sqlBeforeParse, method, args);
+        return INSTANCE.parserSqlWithParameters(sqlBeforeParse, method, args, isSimpleType, parameter, metaObject);
     }
 
-    private ParseSqlResult parserSqlWithParameters(String sqlBeforeParse, Method method, Object[] args) {
+    private ParseSqlResult parserSqlWithParameters(String sqlBeforeParse, Method method, Object[] args, boolean isSimpleType, Object parameter, MetaObject metaObject) {
 
         Parameter[] parameters = method.getParameters();
 
         if (parameters == null || parameters.length == 0) return new ParseSqlResult(sqlBeforeParse);
 
         //解析方法参数
-        ParamNameResolver paramNameResolver = new ParamNameResolver(method);
-        Object parameter = paramNameResolver.getNamedParams(args);
+//        ParamNameResolver paramNameResolver = new ParamNameResolver(method);
+//        Object parameter = paramNameResolver.getNamedParams(args);
         //parameterMappings 如果多参数那么是个map,如果单参数且不是list/array 就是原对象
         //sql中的#{name} 的list
         List<String> mapping = new ArrayList<>();
@@ -57,18 +52,25 @@ public class Parser {
             mapping.add(content);
             return "?";
         });
-        //往mapping中添加值
+        //往mapping中添加值(parser的匿名callback才会被调用)
         String sql1 = parser.parse(sqlBeforeParse);
+
         List<Pair<String, Object>> paramMappingList = new ArrayList<>();
         Map<String, Object> paramMapping = new LinkedHashMap<>();
+//        //是否是单参数java基础类型
+//        boolean contains = TypeUtil.typeList.contains(parameter.getClass());
+//        MetaObject metaObject = null;
+//        if (!contains) {
+//            metaObject = MetaObject.forObject(parameter);
+//        }
         for (String name : mapping) {
-            if (TypeUtil.typeList.contains(parameter.getClass())) {
-                //单参数java基础类型
+            if (isSimpleType) {
+                //是否是单参数java基础类型
                 paramMapping.put(name, parameter);
                 paramMappingList.add(new Pair<>(name, parameter));
             } else {
                 //pojo或者map
-                Object value = MetaObject.forObject(parameter).getValue(name);
+                Object value = metaObject.getValue(name);
                 paramMapping.put(name, value);
                 paramMappingList.add(new Pair<>(name, value));
             }

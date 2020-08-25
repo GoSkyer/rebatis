@@ -4,6 +4,7 @@ import io.vertx.core.Future;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.reflection.MetaObject;
 import org.gosky.Rebatis;
 import org.gosky.adapter.CallAdapter;
 import org.gosky.adapter.DefaultCall;
@@ -12,8 +13,10 @@ import org.gosky.common.SQLType;
 import org.gosky.converter.ConverterFactory;
 import org.gosky.converter.ConverterUtil;
 import org.gosky.executor.Executor;
+import org.gosky.parsing.ParamNameResolver;
 import org.gosky.parsing.ParseSqlResult;
 import org.gosky.parsing.Parser;
+import org.gosky.util.TypeUtil;
 import org.gosky.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,34 +29,36 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
- * @Auther: guozhong
- * @Date: 2019-03-28 18:17
- * @Description:
+ * 缓存每个method 解析后的信息
  */
 public class ServiceMethod {
-    private Logger logger = LoggerFactory.getLogger(ServiceMethod.class);
-    private SqlFactory sqlFactory;
-    private Executor executor;
+    private final Logger logger = LoggerFactory.getLogger(ServiceMethod.class);
+    private final SqlFactory sqlFactory;
+    private final Executor executor;
     private ConverterFactory converterFactory;
     private final CallAdapter<?, ?> callAdapter;
+    private final Class<?> mapper;
 
-    public ServiceMethod(SqlFactory sqlFactory, Executor executor, ConverterFactory converterFactory, CallAdapter<?, ?> callAdapter) {
+    public ServiceMethod(SqlFactory sqlFactory, Executor executor, ConverterFactory converterFactory, CallAdapter<?, ?> callAdapter, Class<?> mapper) {
         this.sqlFactory = sqlFactory;
         this.executor = executor;
         this.converterFactory = converterFactory;
         this.callAdapter = callAdapter;
+        this.mapper = mapper;
     }
 
     public static ServiceMethod parseAnnotations(Rebatis rebatis, Class<?> mapper, Method method) {
 
         Annotation[] annotations = method.getDeclaredAnnotations();
+        //构建方法SQL映射
+        SqlFactory sqlFactory = new SqlFactory();
         //获取SQL类型
         SQLType sqlType = SQLType.UNKNOWN;
         String sql = null;
+        boolean isBaseMethod = false;
         if (annotations[0] instanceof Insert) {
             Insert anno = (Insert) annotations[0];
             sql = anno.value()[0];
@@ -72,11 +77,13 @@ public class ServiceMethod {
             sqlType = SQLType.SELECT;
         } else if (annotations[0] instanceof SelectProvider) {
             SelectProvider anno = (SelectProvider) annotations[0];
-            Class<?> providerClass = anno.value();
+            sqlFactory.setProviderClass(anno.value());
             String providerMethodName = anno.method();
+            Method providerMethod = resolveMethod(sqlFactory.getProviderClass(), providerMethodName);
+            sqlFactory.setProviderMethod(providerMethod);
+//            sql = invokeProviderMethod(providerClass, providerMethod, mapper);
             sqlType = SQLType.SELECT;
-            Method providerMethod = resolveMethod(providerClass, providerMethodName);
-            sql = invokeProviderMethod(providerClass, providerMethod, mapper);
+            isBaseMethod = true;
         }
 
 
@@ -97,19 +104,20 @@ public class ServiceMethod {
             returnTypeEnum = ReturnTypeEnum.SINGLE;
         }
 
-        //构建方法SQL映射
-        SqlFactory sqlFactory = SqlFactory.SqlFactoryBuilder.aSqlFactory().methodName(method.getName())
-                .method(method)
-                .responseType(dataContainerType)
-                .returnType(method.getGenericReturnType())
-                .returnTypeEnum(returnTypeEnum)
-                .parameterTypes(method.getParameterTypes())
-                .sql(sql)
-                .sqlType(sqlType)
-                .build();
+
+        sqlFactory.setMethodName(method.getName());
+        sqlFactory.setSql(sql);
+        sqlFactory.setSqlType(sqlType);
+        sqlFactory.setReturnType(method.getGenericReturnType());
+        sqlFactory.setResponseType(dataContainerType);
+        sqlFactory.setParameterTypes(method.getParameterTypes());
+        sqlFactory.setReturnTypeEnum(returnTypeEnum);
+        sqlFactory.setMethod(method);
+        sqlFactory.setBaseMethod(isBaseMethod);
+
 
         return new ServiceMethod(sqlFactory, rebatis.executor, rebatis.converterFactory,
-                rebatis.callAdapter(method.getGenericReturnType(), method.getAnnotations()));
+                rebatis.callAdapter(method.getGenericReturnType(), method.getAnnotations()), mapper);
     }
 
     /**
@@ -117,11 +125,34 @@ public class ServiceMethod {
      *
      * @param args service方法中的参数
      * @return
-     * @throws Exception
      */
-    public Object invoke(Object[] args) throws Exception {
+    public Object invoke(Object[] args) {
+        ParseSqlResult sqlResult;
+        if (args == null || args.length == 0) {
+            sqlResult = new ParseSqlResult(sqlFactory.getSql());
+        } else {
+            //预解析参数
+            //1.解析方法参数
+            ParamNameResolver paramNameResolver = new ParamNameResolver(sqlFactory.getMethod());
+            Object parameter = paramNameResolver.getNamedParams(args);
+            //是否是单参数java基础类型
+            boolean isSimpleType = TypeUtil.typeList.contains(parameter.getClass());
+            MetaObject metaObject = null;
+            if (!isSimpleType) {
+                metaObject = MetaObject.forObject(parameter);
+            }
 
-        ParseSqlResult sqlResult = Parser.parse(sqlFactory.getSql(), sqlFactory.getMethod(), args);
+            //判断是否是baseMapper的method
+            if (sqlFactory.isBaseMethod()) {
+                //调用SqlProvider的方法获取sql
+                String sql = invokeProviderMethod(sqlFactory.getProviderClass(), sqlFactory.getProviderMethod(), mapper, metaObject);
+
+            }
+
+            //解析sql
+            sqlResult = Parser.parse(sqlFactory.getSql(), sqlFactory.getMethod(), args, isSimpleType, parameter, metaObject);
+        }
+
         long start = System.currentTimeMillis();
         Future<Object> future = executor.query(sqlResult.getSql(), sqlResult.getValues()).map(rowSet -> convert(rowSet));
         future.onComplete(o -> {
@@ -171,14 +202,14 @@ public class ServiceMethod {
     }
 
 
-    private static String invokeProviderMethod(Class<?> providerClass, Method method, Class<?> mapperClass) {
+    private static String invokeProviderMethod(Class<?> providerClass, Method method, Class<?> mapperClass, MetaObject metaObject) {
         CharSequence sql;
         try {
             Object targetObject = null;
             if (!Modifier.isStatic(method.getModifiers())) {
                 targetObject = providerClass.getDeclaredConstructor().newInstance();
             }
-            sql = (CharSequence) method.invoke(targetObject, mapperClass);
+            sql = (CharSequence) method.invoke(targetObject, mapperClass, metaObject);
         } catch (Exception e) {
             throw new RuntimeException("Error invoking SqlProvider method '" + method
                     + "' with specify parameter '" + (mapperClass == null ? null : mapperClass.getClass()) + "'.  Cause: " + e, e);

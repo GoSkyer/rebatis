@@ -60,17 +60,17 @@ public class Rebatis {
     }
 
     private ServiceMethod loadServiceMethod(Class<?> mapper, Method method) {
-        ServiceMethod result = serviceMethodCache.get(method);
-        if (result != null) return result;
+        ServiceMethod serviceMethod = serviceMethodCache.get(method);
+        if (serviceMethod != null) return serviceMethod;
 
         synchronized (serviceMethodCache) {
-            result = serviceMethodCache.get(method);
-            if (result == null) {
-                result = ServiceMethod.parseAnnotations(this, mapper, method);
-                serviceMethodCache.put(method, result);
+            serviceMethod = serviceMethodCache.get(method);
+            if (serviceMethod == null) {
+                serviceMethod = ServiceMethod.parseAnnotations(this, mapper, method);
+                serviceMethodCache.put(method, serviceMethod);
             }
         }
-        return result;
+        return serviceMethod;
     }
 
 
