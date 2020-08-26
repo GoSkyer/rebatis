@@ -47,7 +47,8 @@ public class BaseMapperProvider extends MapperTemplate {
         StringBuilder sql = new StringBuilder();
         sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
         sql.append(SqlHelper.updateSetColumns(entityClass,  metaObject));
-        sql.append(SqlHelper.wherePKColumns(entityClass, true));
+//        sql.append(SqlHelper.wherePKColumns(entityClass, true));
+        sql.append(" where id = #{id}");
         return sql.toString();
     }
 

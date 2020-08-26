@@ -50,9 +50,10 @@ public class ConverterUtil {
             return null;
         }
 
-        if (sqlFactory.getSqlType() != SQLType.SELECT) {
-            long lastInsertId = rowSet.property(MySQLClient.LAST_INSERTED_ID);
-            return lastInsertId;
+        if (sqlFactory.getSqlType() == SQLType.INSERT) {
+            return rowSet.property(MySQLClient.LAST_INSERTED_ID);
+        } else if (sqlFactory.getSqlType() == SQLType.UPDATE || sqlFactory.getSqlType() == SQLType.DELETE){
+            return rowSet.rowCount();
         }
 
         int size = rowSet.size();

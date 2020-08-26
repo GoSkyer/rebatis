@@ -179,7 +179,7 @@ public class SqlHelper {
                 sql.append(SqlHelper.getIfNotNull(column, column.getColumnEqualsHolder(null) + ",", metaObject));
             }
         }
-        return " set " + StringUtils.strip(sql.toString().trim(), "AND");
+        return " set " + StringUtils.strip(StringUtils.strip(sql.toString().trim(), "AND"), ",");
     }
 
 }

@@ -95,6 +95,15 @@ public class ServiceMethod {
 //            sql = invokeProviderMethod(providerClass, providerMethod, mapper);
             sqlType = SQLType.INSERT;
             isBaseMethod = true;
+        } if (annotations[0] instanceof UpdateProvider) {
+            UpdateProvider anno = (UpdateProvider) annotations[0];
+            sqlFactory.setProviderClass(anno.value());
+            String providerMethodName = anno.method();
+            Method providerMethod = ProviderUtil.resolveMethod(sqlFactory.getProviderClass(), providerMethodName);
+            sqlFactory.setProviderMethod(providerMethod);
+//            sql = invokeProviderMethod(providerClass, providerMethod, mapper);
+            sqlType = SQLType.UPDATE;
+            isBaseMethod = true;
         }
 
         Type dataContainerType;

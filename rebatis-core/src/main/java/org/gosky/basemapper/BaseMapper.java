@@ -34,6 +34,6 @@ public interface BaseMapper<T> {
      * @return
      */
     @UpdateProvider(value = BaseMapperProvider.class, method = "updateByPrimaryKey")
-    int updateByPrimaryKey(T record);
+    Call<Integer> updateByPrimaryKey(T record);
 
 }
