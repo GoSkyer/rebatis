@@ -157,9 +157,9 @@ public class EntityHelper {
 //        entityColumn.setUseJavaType(config.isUseJavaType());
         //记录 field 信息，方便后续扩展使用
         entityColumn.setEntityField(field);
-//        if (field.isAnnotationPresent(Id.class)) {
-//            entityColumn.setId(true);
-//        }
+        if ("id".equals(field.getName())) {
+            entityColumn.setId(true);
+        }
         //Column
         String columnName = null;
 //        if (field.isAnnotationPresent(Column.class)) {

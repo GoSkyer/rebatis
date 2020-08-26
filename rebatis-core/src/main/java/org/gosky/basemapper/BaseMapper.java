@@ -2,6 +2,7 @@ package org.gosky.basemapper;
 
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.gosky.adapter.Call;
 
 public interface BaseMapper<T> {
@@ -24,5 +25,15 @@ public interface BaseMapper<T> {
      */
     @InsertProvider(value = BaseMapperProvider.class, method = "insert")
     Call<Long> insert(T record);
+
+
+    /**
+     * 根据主键更新属性不为null的值
+     *
+     * @param record
+     * @return
+     */
+    @UpdateProvider(value = BaseMapperProvider.class, method = "updateByPrimaryKey")
+    int updateByPrimaryKey(T record);
 
 }

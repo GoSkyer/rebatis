@@ -42,4 +42,13 @@ public class BaseMapperProvider extends MapperTemplate {
         return sql.toString();
     }
 
+    public String updateByPrimaryKey(Class<?> mapper, MetaObject metaObject) {
+        Class<?> entityClass = getEntityClass(mapper);
+        StringBuilder sql = new StringBuilder();
+        sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
+        sql.append(SqlHelper.updateSetColumns(entityClass,  metaObject));
+        sql.append(SqlHelper.wherePKColumns(entityClass, true));
+        return sql.toString();
+    }
+
 }

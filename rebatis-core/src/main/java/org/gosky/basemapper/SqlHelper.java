@@ -25,8 +25,11 @@
 package org.gosky.basemapper;
 
 
+import io.netty.util.internal.StringUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.reflection.MetaObject;
+import org.gosky.util.MapperStringUtil;
 
 import java.util.Set;
 
@@ -56,12 +59,27 @@ public class SqlHelper {
      * 判断自动!=null的条件结构
      *
      * @param column
-     * @param metaObject
+     * @param contents
      * @return
      */
     public static String getIfNotNull(EntityColumn column, String contents, MetaObject metaObject) {
+        return getIfNotNull(null, column, contents, metaObject);
+    }
+
+    /**
+     * 判断自动!=null的条件结构
+     *
+     * @param column
+     * @param metaObject
+     * @return
+     */
+    public static String getIfNotNull(String entityName, EntityColumn column, String contents, MetaObject metaObject) {
+        StringBuilder sql = new StringBuilder();
         if (metaObject.getValue(column.getProperty()) != null) {
-            return contents;
+            if (MapperStringUtil.isNotEmpty(entityName)) {
+                sql.append(entityName).append(".");
+            }
+            return sql.append(contents).toString();
         } else {
             return "";
         }
@@ -127,6 +145,41 @@ public class SqlHelper {
             sql.append(getIfNotNull(column, " AND " + column.getColumnEqualsHolder(), metaObject));
         }
         return " where " + StringUtils.strip(sql.toString().trim(), "AND");
+    }
+
+
+    /**
+     * update tableName -
+     *
+     * @param entityClass
+     * @param defaultTableName 默认表名
+     * @return
+     */
+    public static String updateTable(Class<?> entityClass, String defaultTableName) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE ");
+        sql.append(defaultTableName);
+        sql.append(" ");
+        return sql.toString();
+    }
+
+
+    /**
+     * update set列
+     *
+     * @param entityClass
+     * @return
+     */
+    public static String updateSetColumns(Class<?> entityClass, MetaObject metaObject) {
+        StringBuilder sql = new StringBuilder();
+        //获取全部列
+        Set<EntityColumn> columnSet = EntityHelper.getColumns(entityClass);
+        for (EntityColumn column : columnSet) {
+            if (!column.isId()) {
+                sql.append(SqlHelper.getIfNotNull(column, column.getColumnEqualsHolder(null) + ",", metaObject));
+            }
+        }
+        return " set " + StringUtils.strip(sql.toString().trim(), "AND");
     }
 
 }

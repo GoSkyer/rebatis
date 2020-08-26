@@ -47,6 +47,7 @@ public class EntityColumn {
      */
     private String column;
     private Class<?> javaType;
+    private boolean id = false;
 
     /**
      * 对应的字段信息
@@ -166,5 +167,12 @@ public class EntityColumn {
 
     public void setJavaType(Class<?> javaType) {
         this.javaType = javaType;
+    }
+    public boolean isId() {
+        return id;
+    }
+
+    public void setId(boolean id) {
+        this.id = id;
     }
 }
