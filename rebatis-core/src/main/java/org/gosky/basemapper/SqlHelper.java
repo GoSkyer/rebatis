@@ -25,7 +25,10 @@
 package org.gosky.basemapper;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.reflection.MetaObject;
+
+import java.util.Set;
 
 /**
  * 拼常用SQL的工具类
@@ -62,6 +65,68 @@ public class SqlHelper {
         } else {
             return "";
         }
+    }
+
+
+    /**
+     * select xxx,xxx...
+     *
+     * @param entityClass
+     * @return
+     */
+    public static String selectAllColumns(Class<?> entityClass) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT ");
+        sql.append(getAllColumns(entityClass));
+        sql.append(" ");
+        return sql.toString();
+    }
+
+    /**
+     * 获取所有查询列，如id,name,code...
+     *
+     * @param entityClass
+     * @return
+     */
+    public static String getAllColumns(Class<?> entityClass) {
+        Set<EntityColumn> columnSet = EntityHelper.getColumns(entityClass);
+        StringBuilder sql = new StringBuilder();
+        for (EntityColumn entityColumn : columnSet) {
+            sql.append(entityColumn.getColumn()).append(",");
+        }
+        return sql.substring(0, sql.length() - 1);
+    }
+
+    /**
+     * from tableName - 动态表名
+     *
+     * @param entityClass
+     * @param defaultTableName
+     * @return
+     */
+    public static String fromTable(Class<?> entityClass, String defaultTableName) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" FROM ");
+        sql.append(defaultTableName);
+        sql.append(" ");
+        return sql.toString();
+    }
+
+
+    /**
+     * where所有列的条件，会判断是否!=null
+     *
+     * @param entityClass
+     * @return
+     */
+    public static String whereAllIfColumns(Class<?> entityClass, MetaObject metaObject) {
+        StringBuilder sql = new StringBuilder();
+        //获取全部列
+        Set<EntityColumn> columnSet = EntityHelper.getColumns(entityClass);
+        for (EntityColumn column : columnSet) {
+            sql.append(getIfNotNull(column, " AND " + column.getColumnEqualsHolder(), metaObject));
+        }
+        return " where " + StringUtils.strip(sql.toString().trim(), "AND");
     }
 
 }

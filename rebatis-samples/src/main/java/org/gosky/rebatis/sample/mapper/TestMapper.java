@@ -20,7 +20,7 @@ public interface TestMapper extends BaseMapper<User> {
     @Select("select name from user where name = #{user.name} and age = #{user.age} and sex = 1 limit #{limit}")
     Call<String> test(@Param("user") User user, @Param("limit") Integer limit);
 
-    @Insert("INSERT INTO user (username, password) VALUES ('test3', '12321233')")
-    Call<Void> insert();
+//    @Insert("INSERT INTO user (username, password) VALUES ('test3', '12321233')")
+//    Call<Void> insert();
 
 }

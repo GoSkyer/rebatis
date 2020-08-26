@@ -6,6 +6,19 @@ import java.util.Set;
 
 public class BaseMapperProvider extends MapperTemplate {
 
+
+    public String selectOne(Class<?> mapper, MetaObject metaObject) {
+        Class<?> entityClass = getEntityClass(mapper);
+        //修改返回值类型为实体类型
+//        setResultType(ms, entityClass);
+        StringBuilder sql = new StringBuilder();
+        sql.append(SqlHelper.selectAllColumns(entityClass));
+        sql.append(SqlHelper.fromTable(entityClass, tableName(entityClass)));
+        sql.append(SqlHelper.whereAllIfColumns(entityClass, metaObject));
+        return sql.toString();
+    }
+
+
     public String insert(Class<?> mapper, MetaObject metaObject) {
         Class<?> entityClass = getEntityClass(mapper);
         StringBuilder sql = new StringBuilder();

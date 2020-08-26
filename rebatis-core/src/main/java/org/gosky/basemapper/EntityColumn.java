@@ -83,6 +83,47 @@ public class EntityColumn {
         return sb.toString();
     }
 
+    /**
+     * 返回格式如:#{entityName.age,jdbcType=NUMERIC,typeHandler=MyTypeHandler}
+     *
+     * @param entityName
+     * @return
+     */
+    public String getColumnHolder(String entityName) {
+        return getColumnHolder(entityName, null);
+    }
+
+    /**
+     * 返回格式如:#{entityName.age+suffix,jdbcType=NUMERIC,typeHandler=MyTypeHandler}
+     *
+     * @param entityName
+     * @param suffix
+     * @return
+     */
+    public String getColumnHolder(String entityName, String suffix) {
+        return getColumnHolder(entityName, null, null);
+    }
+
+    /**
+     * 返回格式如:colum = #{age,jdbcType=NUMERIC,typeHandler=MyTypeHandler}
+     *
+     * @return
+     */
+    public String getColumnEqualsHolder() {
+        return getColumnEqualsHolder(null);
+    }
+
+    /**
+     * 返回格式如:colum = #{age,jdbcType=NUMERIC,typeHandler=MyTypeHandler}
+     *
+     * @param entityName
+     * @return
+     */
+    public String getColumnEqualsHolder(String entityName) {
+        return this.column + " = " + getColumnHolder(entityName);
+    }
+
+
     public EntityColumn(EntityTable table) {
         this.table = table;
     }

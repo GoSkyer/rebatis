@@ -3,10 +3,13 @@ package org.gosky.converter;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.jackson.DatabindCodec;
+import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowIterator;
 import io.vertx.sqlclient.RowSet;
 import org.gosky.common.ReturnTypeEnum;
+import org.gosky.common.SQLType;
+import org.gosky.mapping.SqlFactory;
 import org.gosky.util.TypeUtil;
 
 import java.lang.reflect.ParameterizedType;
@@ -40,16 +43,24 @@ public class ConverterUtil {
     }
 
 
-    public Object convert(RowSet<Row> rowSet, ReturnTypeEnum returnTypeEnum, Type type) {
+    public Object convert(SqlFactory sqlFactory, RowSet<Row> rowSet, ReturnTypeEnum returnTypeEnum, Type type) {
 //        ResultSet rows = rowSet.
+
+        if (returnTypeEnum == ReturnTypeEnum.VOID) {
+            return null;
+        }
+
+        if (sqlFactory.getSqlType() != SQLType.SELECT) {
+            long lastInsertId = rowSet.property(MySQLClient.LAST_INSERTED_ID);
+            return lastInsertId;
+        }
+
         int size = rowSet.size();
         if (size == 0) {
             return null;
         }
 
-        if (returnTypeEnum == ReturnTypeEnum.VOID) {
-            return null;
-        } else if (returnTypeEnum == ReturnTypeEnum.LIST) {
+        if (returnTypeEnum == ReturnTypeEnum.LIST) {
             Type dataType;
             if (type instanceof ParameterizedType) {
                 dataType = ((ParameterizedType) type).getActualTypeArguments()[0];

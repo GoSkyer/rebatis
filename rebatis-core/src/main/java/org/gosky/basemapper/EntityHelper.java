@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.text.MessageFormat;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -24,6 +26,34 @@ public class EntityHelper {
      * 实体类 => 表对象
      */
     private static final Map<Class<?>, EntityTable> entityTableMap = new ConcurrentHashMap<Class<?>, EntityTable>();
+
+    protected static final Map<String, Class<?>> entityClassMap = new ConcurrentHashMap<String, Class<?>>();
+
+    /**
+     * 获取返回值类型 - 实体类型
+     *
+     * @return
+     */
+    public static synchronized Class<?> getEntityClass(Class<?> mapper) {
+        String mapperName = mapper.getName();
+        if (entityClassMap.containsKey(mapperName)) {
+            return entityClassMap.get(mapperName);
+        } else {
+            Type[] types = mapper.getGenericInterfaces();
+            for (Type type : types) {
+                if (type instanceof ParameterizedType) {
+                    ParameterizedType t = (ParameterizedType) type;
+                    Class<?> returnType = (Class<?>) t.getActualTypeArguments()[0];
+                    //获取该类型后，第一次对该类型进行初始化
+                    EntityHelper.initEntityNameMap(returnType);
+                    entityClassMap.put(mapperName, returnType);
+                    return returnType;
+                }
+            }
+            throw new MapperException("无法获取 " + mapper + " 方法的泛型信息!");
+        }
+    }
+
     /**
      * 初始化实体属性
      *

@@ -8,6 +8,8 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.gosky.Rebatis;
 import org.gosky.adapter.CallAdapter;
 import org.gosky.adapter.DefaultCall;
+import org.gosky.basemapper.EntityHelper;
+import org.gosky.basemapper.ProviderUtil;
 import org.gosky.common.ReturnTypeEnum;
 import org.gosky.common.SQLType;
 import org.gosky.converter.ConverterFactory;
@@ -79,16 +81,29 @@ public class ServiceMethod {
             SelectProvider anno = (SelectProvider) annotations[0];
             sqlFactory.setProviderClass(anno.value());
             String providerMethodName = anno.method();
-            Method providerMethod = resolveMethod(sqlFactory.getProviderClass(), providerMethodName);
+            Method providerMethod = ProviderUtil.resolveMethod(sqlFactory.getProviderClass(), providerMethodName);
             sqlFactory.setProviderMethod(providerMethod);
 //            sql = invokeProviderMethod(providerClass, providerMethod, mapper);
             sqlType = SQLType.SELECT;
             isBaseMethod = true;
+        } else if (annotations[0] instanceof InsertProvider) {
+            InsertProvider anno = (InsertProvider) annotations[0];
+            sqlFactory.setProviderClass(anno.value());
+            String providerMethodName = anno.method();
+            Method providerMethod = ProviderUtil.resolveMethod(sqlFactory.getProviderClass(), providerMethodName);
+            sqlFactory.setProviderMethod(providerMethod);
+//            sql = invokeProviderMethod(providerClass, providerMethod, mapper);
+            sqlType = SQLType.INSERT;
+            isBaseMethod = true;
         }
 
-
-        //泛型中的类型 eg: List<String>
-        Type dataContainerType = Utils.getParameterUpperBound(0, ((ParameterizedType) method.getGenericReturnType()));
+        Type dataContainerType;
+        if (isBaseMethod) {
+            dataContainerType = EntityHelper.getEntityClass(mapper);
+        } else {
+            //泛型中的类型 eg: List<String>
+            dataContainerType = Utils.getParameterUpperBound(0, ((ParameterizedType) method.getGenericReturnType()));
+        }
 
         // 获取返回值类型
         ReturnTypeEnum returnTypeEnum;
@@ -145,7 +160,7 @@ public class ServiceMethod {
             //判断是否是baseMapper的method
             if (sqlFactory.isBaseMethod()) {
                 //调用SqlProvider的方法获取sql
-                String sql = invokeProviderMethod(sqlFactory.getProviderClass(), sqlFactory.getProviderMethod(), mapper, metaObject);
+                String sql = ProviderUtil.invokeProviderMethod(sqlFactory.getProviderClass(), sqlFactory.getProviderMethod(), mapper, metaObject);
                 logger.info("base mapper sql={}", sql);
                 sqlFactory.setSql(sql);
             }
@@ -155,11 +170,15 @@ public class ServiceMethod {
         }
 
         long start = System.currentTimeMillis();
-        Future<Object> future = executor.query(sqlResult.getSql(), sqlResult.getValues()).map(rowSet -> convert(rowSet));
+        Future<Object> future = executor.query(sqlResult.getSql(), sqlResult.getValues()).map(rowSet -> convert(sqlFactory, rowSet));
         future.onComplete(o -> {
             logger.info("run sql={}, params={}, duration={}, result={}", sqlResult.getSql(),
-                    sqlResult.getValues(), System.currentTimeMillis() - start,
-                    o);
+                    sqlResult.getValues(), System.currentTimeMillis() - start, o);
+            if (o.failed()){
+                logger.error("run sql={}, params={}, duration={}", sqlResult.getSql(),
+                        sqlResult.getValues(), System.currentTimeMillis() - start, o.cause());
+            }
+
         });
 
         //call只有一个就是defaultCall 返回的不同的那个是CallAdapter
@@ -167,54 +186,10 @@ public class ServiceMethod {
 
     }
 
-    private Object convert(RowSet<Row> queryResult) {
-        return ConverterUtil.with().convert(queryResult, sqlFactory.getReturnTypeEnum()
-                , sqlFactory.getResponseType());
+    private Object convert(SqlFactory sqlFactory, RowSet<Row> queryResult) {
+        return ConverterUtil.with().convert(sqlFactory, queryResult, this.sqlFactory.getReturnTypeEnum()
+                , this.sqlFactory.getResponseType());
     }
 
 
-    /**
-     * 解析provider
-     *
-     * @return
-     */
-    private static Method resolveMethod(Class<?> providerClass, String providerMethod) {
-        List<Method> sameNameMethods = Arrays.stream(providerClass.getMethods())
-                .filter(m -> m.getName().equals(providerMethod))
-                .collect(Collectors.toList());
-        if (sameNameMethods.isEmpty()) {
-            throw new RuntimeException("Cannot resolve the provider method because '"
-                    + providerMethod + "' not found in SqlProvider '" + providerClass.getName() + "'.");
-        }
-        List<Method> targetMethods = sameNameMethods.stream()
-                .filter(m -> CharSequence.class.isAssignableFrom(m.getReturnType()))
-                .collect(Collectors.toList());
-        if (targetMethods.size() == 1) {
-            return targetMethods.get(0);
-        }
-        if (targetMethods.isEmpty()) {
-            throw new RuntimeException("Cannot resolve the provider method because '"
-                    + providerMethod + "' does not return the CharSequence or its subclass in SqlProvider '"
-                    + providerClass.getName() + "'.");
-        } else {
-            throw new RuntimeException("Cannot resolve the provider method because '"
-                    + providerMethod + "' is found multiple in SqlProvider '" + providerClass.getName() + "'.");
-        }
-    }
-
-
-    private static String invokeProviderMethod(Class<?> providerClass, Method method, Class<?> mapperClass, MetaObject metaObject) {
-        CharSequence sql;
-        try {
-            Object targetObject = null;
-            if (!Modifier.isStatic(method.getModifiers())) {
-                targetObject = providerClass.getDeclaredConstructor().newInstance();
-            }
-            sql = (CharSequence) method.invoke(targetObject, mapperClass, metaObject);
-        } catch (Exception e) {
-            throw new RuntimeException("Error invoking SqlProvider method '" + method
-                    + "' with specify parameter '" + (mapperClass == null ? null : mapperClass.getClass()) + "'.  Cause: " + e, e);
-        }
-        return sql != null ? sql.toString() : null;
-    }
 }

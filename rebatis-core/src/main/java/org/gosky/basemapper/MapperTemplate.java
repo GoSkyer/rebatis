@@ -31,7 +31,9 @@ import org.gosky.util.MapperStringUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -39,26 +41,13 @@ import java.util.function.Function;
  */
 public abstract class MapperTemplate {
 
-
     /**
      * 获取返回值类型 - 实体类型
      *
      * @return
      */
     public Class<?> getEntityClass(Class<?> mapper) {
-
-        Type[] types = mapper.getGenericInterfaces();
-        for (Type type : types) {
-            if (type instanceof ParameterizedType) {
-                ParameterizedType t = (ParameterizedType) type;
-                Class<?> returnType = (Class<?>) t.getActualTypeArguments()[0];
-                //获取该类型后，第一次对该类型进行初始化
-                EntityHelper.initEntityNameMap(returnType);
-//                        entityClassMap.put(msId, returnType);
-                return returnType;
-            }
-        }
-        throw new MapperException("无法获取 " + mapper + " 方法的泛型信息!");
+        return EntityHelper.getEntityClass(mapper);
     }
 
     /**
@@ -75,7 +64,7 @@ public abstract class MapperTemplate {
     protected String trim(Function<StringBuilder, String> func) {
         StringBuilder sql = new StringBuilder();
         String apply = func.apply(sql);
-        return StringUtils.strip(apply,",");
+        return StringUtils.strip(apply, ",");
     }
 
 

@@ -1,5 +1,6 @@
 package org.gosky.basemapper;
 
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.gosky.adapter.Call;
 
@@ -11,7 +12,17 @@ public interface BaseMapper<T> {
      * @param record
      * @return
      */
-    @SelectProvider(value = BaseMapperProvider.class, method = "insert")
-    Call<T> insert(T record);
+    @SelectProvider(value = BaseMapperProvider.class, method = "selectOne")
+    Call<T> selectOne(T record);
+
+
+    /**
+     * 保存一个实体，null的属性不会保存，会使用数据库默认值
+     *
+     * @param record
+     * @return
+     */
+    @InsertProvider(value = BaseMapperProvider.class, method = "insert")
+    Call<Long> insert(T record);
 
 }
