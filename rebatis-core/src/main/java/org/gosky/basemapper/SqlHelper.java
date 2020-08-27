@@ -182,4 +182,7 @@ public class SqlHelper {
         return " set " + StringUtils.strip(StringUtils.strip(sql.toString().trim(), "AND"), ",");
     }
 
+    public static String wherePKColumns() {
+        return " where id = #{id}";
+    }
 }

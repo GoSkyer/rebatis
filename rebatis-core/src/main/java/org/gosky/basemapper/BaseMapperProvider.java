@@ -19,6 +19,31 @@ public class BaseMapperProvider extends MapperTemplate {
     }
 
 
+    public String selectByPrimaryKey(Class<?> mapper, MetaObject metaObject) {
+        final Class<?> entityClass = getEntityClass(mapper);
+        StringBuilder sql = new StringBuilder();
+        sql.append(SqlHelper.selectAllColumns(entityClass));
+        sql.append(SqlHelper.fromTable(entityClass, tableName(entityClass)));
+        sql.append(SqlHelper.wherePKColumns());
+        return sql.toString();
+    }
+
+    /**
+     * 查询
+     *
+     * @param mapper
+     * @return
+     */
+    public String select(Class<?> mapper, MetaObject metaObject) {
+        Class<?> entityClass = getEntityClass(mapper);
+        StringBuilder sql = new StringBuilder();
+        sql.append(SqlHelper.selectAllColumns(entityClass));
+        sql.append(SqlHelper.fromTable(entityClass, tableName(entityClass)));
+        sql.append(SqlHelper.whereAllIfColumns(entityClass, metaObject));
+        return sql.toString();
+    }
+
+
     public String insert(Class<?> mapper, MetaObject metaObject) {
         Class<?> entityClass = getEntityClass(mapper);
         StringBuilder sql = new StringBuilder();
@@ -46,9 +71,8 @@ public class BaseMapperProvider extends MapperTemplate {
         Class<?> entityClass = getEntityClass(mapper);
         StringBuilder sql = new StringBuilder();
         sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
-        sql.append(SqlHelper.updateSetColumns(entityClass,  metaObject));
-//        sql.append(SqlHelper.wherePKColumns(entityClass, true));
-        sql.append(" where id = #{id}");
+        sql.append(SqlHelper.updateSetColumns(entityClass, metaObject));
+        sql.append(SqlHelper.wherePKColumns());
         return sql.toString();
     }
 
