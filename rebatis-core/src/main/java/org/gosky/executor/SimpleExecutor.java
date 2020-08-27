@@ -7,7 +7,9 @@ import io.vertx.core.Promise;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
+import io.vertx.sqlclient.SqlClient;
 import io.vertx.sqlclient.Tuple;
+import org.gosky.util.TransactionUtil;
 
 import java.util.List;
 
@@ -26,13 +28,18 @@ public class SimpleExecutor implements Executor {
 
     @Override
     public Future<RowSet<Row>> query(String sql, List<Object> values) {
-        Promise<RowSet<Row>> promise = Promise.promise();
-        if (values != null && values.size() > 0) {
-            tConnectionPool.preparedQuery(sql).execute(Tuple.tuple(values),  promise);
+        SqlClient sqlClient = TransactionUtil.context.get();
+        SqlClient _client;
+        if (sqlClient != null){
+            _client = sqlClient;
         } else {
-            tConnectionPool.query(sql).execute(promise);
+            _client = tConnectionPool;
         }
-        return promise.future();
+        if (values != null && values.size() > 0) {
+           return _client.preparedQuery(sql).execute(Tuple.tuple(values));
+        } else {
+           return _client.query(sql).execute();
+        }
     }
 
     public MySQLPool gettConnectionPool() {

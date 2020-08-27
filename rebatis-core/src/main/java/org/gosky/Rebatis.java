@@ -3,9 +3,7 @@ package org.gosky;
 import io.vertx.mysqlclient.MySQLPool;
 import org.gosky.adapter.CallAdapter;
 import org.gosky.adapter.DefaultCallAdapterFactory;
-import org.gosky.common.BaseMapper;
 import org.gosky.converter.ConverterFactory;
-import org.gosky.executor.Executor;
 import org.gosky.executor.SimpleExecutor;
 import org.gosky.mapping.ServiceMethod;
 import org.slf4j.Logger;
@@ -32,6 +30,15 @@ public class Rebatis {
     private final Map<Method, ServiceMethod> serviceMethodCache = new ConcurrentHashMap<>();
     public final ConverterFactory converterFactory;
     public final List<CallAdapter.Factory> callAdapterFactories;
+    public static Rebatis rebatis;
+
+    public static void init(Rebatis r) {
+        rebatis = r;
+    }
+
+    public static Rebatis get(){
+        return rebatis;
+    }
 
     private Rebatis(SimpleExecutor executor, ConverterFactory converterFactory, List<CallAdapter.Factory> callAdapterFactories) {
         this.executor = executor;
