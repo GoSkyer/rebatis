@@ -25,7 +25,7 @@ public interface BaseMapper<T> {
      * @return
      */
     @SelectProvider(value = BaseMapperProvider.class, method = "selectByPrimaryKey")
-    T selectByPrimaryKey(Object key);
+    Call<T> selectByPrimaryKey(Object key);
 
 
     /**
@@ -35,7 +35,7 @@ public interface BaseMapper<T> {
      * @return
      */
     @SelectProvider(value = BaseMapperProvider.class, method = "select")
-    List<T> select(T record);
+    Call<List<T>> select(T record);
 
     /**
      * 保存一个实体，null的属性不会保存，会使用数据库默认值
