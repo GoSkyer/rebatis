@@ -27,7 +27,7 @@ public class Rebatis {
     private static final Logger logger = LoggerFactory.getLogger(Rebatis.class);
 
     public final SimpleExecutor executor;
-    private final Map<Method, ServiceMethod> serviceMethodCache = new ConcurrentHashMap<>();
+    private final Map<String, ServiceMethod> serviceMethodCache = new ConcurrentHashMap<>();
     public final ConverterFactory converterFactory;
     public final List<CallAdapter.Factory> callAdapterFactories;
     public static Rebatis rebatis;
@@ -67,14 +67,15 @@ public class Rebatis {
     }
 
     private ServiceMethod loadServiceMethod(Class<?> mapper, Method method) {
-        ServiceMethod serviceMethod = serviceMethodCache.get(method);
+        String msid = mapper.getName() + "." + method.getName();
+        ServiceMethod serviceMethod = serviceMethodCache.get(msid);
         if (serviceMethod != null) return serviceMethod;
 
         synchronized (serviceMethodCache) {
-            serviceMethod = serviceMethodCache.get(method);
+            serviceMethod = serviceMethodCache.get(msid);
             if (serviceMethod == null) {
                 serviceMethod = ServiceMethod.parseAnnotations(this, mapper, method);
-                serviceMethodCache.put(method, serviceMethod);
+                serviceMethodCache.put(msid, serviceMethod);
             }
         }
         return serviceMethod;
