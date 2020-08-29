@@ -67,6 +67,30 @@ public class BaseMapperProvider extends MapperTemplate {
         return sql.toString();
     }
 
+    public String save(Class<?> mapper, MetaObject metaObject) {
+        Class<?> entityClass = getEntityClass(mapper);
+        StringBuilder sql = new StringBuilder();
+        //获取全部列
+        Set<EntityColumn> columnList = EntityHelper.getColumns(entityClass);
+        sql.append(SqlHelper.replaceIntoTable(entityClass, tableName(entityClass)));
+        sql.append(trim(_sql -> {
+            for (EntityColumn column : columnList) {
+                _sql.append(SqlHelper.getIfNotNull(column, column.getColumn() + ",", metaObject));
+            }
+            return _sql.toString();
+        }));
+        sql.append(") VALUES( ");
+        sql.append(trim(_sql -> {
+            for (EntityColumn column : columnList) {
+                _sql.append(SqlHelper.getIfNotNull(column, column.getColumnHolder(null, null, ","), metaObject));
+            }
+            return _sql.toString();
+        }));
+        sql.append(");");
+        return sql.toString();
+    }
+
+
     public String updateByPrimaryKey(Class<?> mapper, MetaObject metaObject) {
         Class<?> entityClass = getEntityClass(mapper);
         StringBuilder sql = new StringBuilder();

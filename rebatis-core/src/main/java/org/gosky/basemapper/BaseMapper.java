@@ -56,4 +56,13 @@ public interface BaseMapper<T> {
     @UpdateProvider(value = BaseMapperProvider.class, method = "updateByPrimaryKey")
     Call<Integer> updateByPrimaryKey(T record);
 
+
+    /**
+     * insert or update
+     *
+     * @param record
+     * @return
+     */
+    @InsertProvider(value = BaseMapperProvider.class, method = "save")
+    Call<Long> save(T record);
 }

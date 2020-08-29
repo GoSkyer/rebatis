@@ -56,6 +56,21 @@ public class SqlHelper {
     }
 
     /**
+     * replace into tableName - 动态表名
+     *
+     * @param entityClass
+     * @param defaultTableName
+     * @return
+     */
+    public static String replaceIntoTable(Class<?> entityClass, String defaultTableName) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("REPLACE INTO ");
+        sql.append(defaultTableName);
+        sql.append(" (");
+        return sql.toString();
+    }
+
+    /**
      * 判断自动!=null的条件结构
      *
      * @param column
