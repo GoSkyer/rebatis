@@ -52,7 +52,7 @@ public class BaseMapperProvider extends MapperTemplate {
         sql.append(SqlHelper.insertIntoTable(entityClass, tableName(entityClass)));
         sql.append(trim(_sql -> {
             for (EntityColumn column : columnList) {
-                _sql.append(SqlHelper.getIfNotNull(column, column.getProperty() + ",", metaObject));
+                _sql.append(SqlHelper.getIfNotNull(column, column.getColumn() + ",", metaObject));
             }
             return _sql.toString();
         }));
