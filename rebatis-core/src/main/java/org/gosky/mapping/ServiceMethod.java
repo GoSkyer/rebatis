@@ -22,6 +22,7 @@ import org.gosky.util.TypeUtil;
 import org.gosky.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -95,7 +96,8 @@ public class ServiceMethod {
 //            sql = invokeProviderMethod(providerClass, providerMethod, mapper);
             sqlType = SQLType.INSERT;
             isBaseMethod = true;
-        } if (annotations[0] instanceof UpdateProvider) {
+        }
+        if (annotations[0] instanceof UpdateProvider) {
             UpdateProvider anno = (UpdateProvider) annotations[0];
             sqlFactory.setProviderClass(anno.value());
             String providerMethodName = anno.method();
@@ -106,12 +108,15 @@ public class ServiceMethod {
             isBaseMethod = true;
         }
 
-        Type dataContainerType;
+        //泛型中的类型 eg: Call<User>
+        Type dataContainerType = Utils.getParameterUpperBound(0, ((ParameterizedType) method.getGenericReturnType()));
+
         if (isBaseMethod) {
-            dataContainerType = EntityHelper.getEntityClass(mapper);
-        } else {
-            //泛型中的类型 eg: List<String>
-            dataContainerType = Utils.getParameterUpperBound(0, ((ParameterizedType) method.getGenericReturnType()));
+            if (dataContainerType instanceof ParameterizedType) {
+                dataContainerType = ParameterizedTypeImpl.make((Class)(((ParameterizedType) dataContainerType).getRawType()), new Type[]{EntityHelper.getEntityClass(mapper)}, null);
+            } else {
+                dataContainerType = ParameterizedTypeImpl.make(dataContainerType.getClass(), new Type[]{EntityHelper.getEntityClass(mapper)}, null);
+            }
         }
 
         // 获取返回值类型
@@ -183,7 +188,7 @@ public class ServiceMethod {
         future.onComplete(o -> {
             logger.info("run sql={}, params={}, duration={}, result={}", sqlResult.getSql(),
                     sqlResult.getValues(), System.currentTimeMillis() - start, o);
-            if (o.failed()){
+            if (o.failed()) {
                 logger.error("run sql={}, params={}, duration={}", sqlResult.getSql(),
                         sqlResult.getValues(), System.currentTimeMillis() - start, o.cause());
             }
