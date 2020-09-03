@@ -1,5 +1,11 @@
 package org.gosky.converter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializable;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.jackson.DatabindCodec;
@@ -27,8 +33,10 @@ import java.util.Map;
 
 public class ConverterUtil {
     private static ConverterUtil singleton;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private ConverterUtil() {
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE);
     }
 
     public static ConverterUtil with() {
@@ -52,7 +60,7 @@ public class ConverterUtil {
 
         if (sqlFactory.getSqlType() == SQLType.INSERT) {
             return rowSet.property(MySQLClient.LAST_INSERTED_ID);
-        } else if (sqlFactory.getSqlType() == SQLType.UPDATE || sqlFactory.getSqlType() == SQLType.DELETE){
+        } else if (sqlFactory.getSqlType() == SQLType.UPDATE || sqlFactory.getSqlType() == SQLType.DELETE) {
             return rowSet.rowCount();
         }
 
@@ -74,11 +82,20 @@ public class ConverterUtil {
                 if (TypeUtil.typeList.contains(dataType)) {
                     list.add(row.getValue(0));
                 } else {
-                    JsonObject json = new JsonObject();
+                    ObjectNode objectNode = objectMapper.createObjectNode();
                     for (int i = 0; i < row.size(); i++) {
-                        json.getMap().put(row.getColumnName(i), row.getValue(i));
+                        if (row.getValue(i) == null) {
+                            objectNode.put(row.getColumnName(i), (String) null);
+                        } else {
+                            objectNode.put(row.getColumnName(i), row.getValue(i).toString());
+                        }
                     }
-                    list.add(json.mapTo((Class) dataType));
+                    try {
+                        list.add(objectMapper.treeToValue(objectNode, (Class) dataType));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(e);
+                    }
                 }
             });
 
@@ -101,11 +118,16 @@ public class ConverterUtil {
                 if (TypeUtil.typeList.contains(type)) {
                     return row.getValue(0);
                 } else {
-                    JsonObject json = new JsonObject();
+                    ObjectNode objectNode = objectMapper.createObjectNode();
                     for (int i = 0; i < row.size(); i++) {
-                        json.getMap().put(row.getColumnName(i), row.getValue(i));
+                        objectNode.put(row.getColumnName(i), row.getValue(i).toString());
                     }
-                    return json.mapTo((Class) type);
+                    try {
+                        return objectMapper.treeToValue(objectNode, (Class) type);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         } else {
