@@ -14,6 +14,7 @@ public class User {
     private String name;
     private Integer age;
     private Integer sex;
+    private String tradeDate;
 
     public Integer getId() {
         return id;
@@ -47,6 +48,14 @@ public class User {
         this.sex = sex;
     }
 
+    public String getTradeDate() {
+        return tradeDate;
+    }
+
+    public void setTradeDate(String tradeDate) {
+        this.tradeDate = tradeDate;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -54,6 +63,7 @@ public class User {
                 ", name='" + name + '\'' +
                 ", age=" + age +
                 ", sex=" + sex +
+                ", tradeDate='" + tradeDate + '\'' +
                 '}';
     }
 }
