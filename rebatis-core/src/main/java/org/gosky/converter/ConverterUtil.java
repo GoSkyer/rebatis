@@ -36,7 +36,7 @@ public class ConverterUtil {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private ConverterUtil() {
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE);
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
     }
 
     public static ConverterUtil with() {
