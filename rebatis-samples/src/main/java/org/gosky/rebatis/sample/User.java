@@ -15,6 +15,7 @@ public class User {
     private Integer age;
     private Integer sex;
     private String tradeDate;
+    private Boolean vip;
 
     public Integer getId() {
         return id;
@@ -56,6 +57,14 @@ public class User {
         this.tradeDate = tradeDate;
     }
 
+    public Boolean getVip() {
+        return vip;
+    }
+
+    public void setVip(Boolean vip) {
+        this.vip = vip;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -64,6 +73,7 @@ public class User {
                 ", age=" + age +
                 ", sex=" + sex +
                 ", tradeDate='" + tradeDate + '\'' +
+                ", vip=" + vip +
                 '}';
     }
 }
