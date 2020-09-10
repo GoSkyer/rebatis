@@ -28,7 +28,7 @@ public class SimpleExecutor implements Executor {
 
     @Override
     public Future<RowSet<Row>> query(String sql, List<Object> values) {
-        SqlClient sqlClient = TransactionUtil.context.get();
+        SqlClient sqlClient = TransactionUtil.INSTANCE.getContext().get();
         SqlClient _client;
         if (sqlClient != null){
             _client = sqlClient;
