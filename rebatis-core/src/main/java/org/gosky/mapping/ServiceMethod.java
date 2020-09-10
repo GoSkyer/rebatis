@@ -1,6 +1,7 @@
 package org.gosky.mapping;
 
 import io.vertx.core.Future;
+import io.vertx.mysqlclient.MySQLException;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import org.apache.ibatis.annotations.*;
@@ -113,7 +114,7 @@ public class ServiceMethod {
 
         if (isBaseMethod) {
             if (dataContainerType instanceof ParameterizedType) {
-                dataContainerType = ParameterizedTypeImpl.make((Class)(((ParameterizedType) dataContainerType).getRawType()), new Type[]{EntityHelper.getEntityClass(mapper)}, null);
+                dataContainerType = ParameterizedTypeImpl.make((Class) (((ParameterizedType) dataContainerType).getRawType()), new Type[]{EntityHelper.getEntityClass(mapper)}, null);
             } else {
                 dataContainerType = ParameterizedTypeImpl.make(dataContainerType.getClass(), new Type[]{EntityHelper.getEntityClass(mapper)}, null);
             }
@@ -189,8 +190,14 @@ public class ServiceMethod {
             logger.info("run sql={}, params={}, duration={}, result={}", sqlResult.getSql(),
                     sqlResult.getValues(), System.currentTimeMillis() - start, o);
             if (o.failed()) {
-                logger.error("run sql={}, params={}, duration={}", sqlResult.getSql(),
-                        sqlResult.getValues(), System.currentTimeMillis() - start, o.cause());
+                Throwable cause = o.cause();
+                if (cause instanceof MySQLException && cause.getMessage() != null && cause.getMessage().contains("Duplicate entry")){
+                    logger.error("run sql={}, params={}, duration={}, msg={}", sqlResult.getSql(),
+                            sqlResult.getValues(), System.currentTimeMillis() - start, cause.getMessage());
+                } else {
+                    logger.error("run sql={}, params={}, duration={}", sqlResult.getSql(),
+                            sqlResult.getValues(), System.currentTimeMillis() - start, cause);
+                }
             }
 
         });
