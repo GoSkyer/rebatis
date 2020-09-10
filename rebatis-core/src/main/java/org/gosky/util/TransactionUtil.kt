@@ -10,7 +10,7 @@ object TransactionUtil {
     private val logger = LoggerFactory.getLogger(TransactionUtil::class.java)
     val context = TransmittableThreadLocal<SqlClient>()
 
-    suspend fun inTransaction(call: Call) {
+    suspend fun inTransaction(call: suspend () -> Unit) {
         val connection = Rebatis.rebatis.executor.gettConnectionPool().connection.await()
         val transaction = connection.begin().await()
         val result = kotlin.runCatching {
@@ -25,7 +25,4 @@ object TransactionUtil {
         connection.close()
     }
 
-    interface Call {
-        suspend fun invoke()
-    }
 }
