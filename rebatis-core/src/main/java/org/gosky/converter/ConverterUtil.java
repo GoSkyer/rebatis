@@ -17,6 +17,8 @@ import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowIterator;
 import io.vertx.sqlclient.RowSet;
+import io.vertx.sqlclient.data.Numeric;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.gosky.common.ReturnTypeEnum;
 import org.gosky.common.SQLType;
 import org.gosky.mapping.SqlFactory;
@@ -123,6 +125,10 @@ public class ConverterUtil {
             if (iterator.hasNext()) {
                 Row row = iterator.next();
                 if (TypeUtil.typeList.contains(type)) {
+                    if (row.getValue(0) != null && row.getValue(0) instanceof Numeric) {
+                        return NumberUtils.createNumber(((Numeric) row.getValue(0)).toString());
+                    }
+
                     return row.getValue(0);
                 } else {
                     Map<String, Object> map = new HashMap<>();
