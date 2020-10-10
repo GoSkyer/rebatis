@@ -10,6 +10,7 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.util.JdbcConstants;
 import jdk.nashorn.internal.ir.LiteralNode;
 import kotlin.Pair;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.lang.reflect.Method;
@@ -18,6 +19,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author: Galaxy
@@ -42,9 +44,6 @@ public class Parser {
 
         if (parameters == null || parameters.length == 0) return new ParseSqlResult(sqlBeforeParse);
 
-        //解析方法参数
-//        ParamNameResolver paramNameResolver = new ParamNameResolver(method);
-//        Object parameter = paramNameResolver.getNamedParams(args);
         //parameterMappings 如果多参数那么是个map,如果单参数且不是list/array 就是原对象
         //sql中的#{name} 的list
         List<String> mapping = new ArrayList<>();
@@ -52,17 +51,11 @@ public class Parser {
             mapping.add(content);
             return "?";
         });
-        //往mapping中添加值(parser的匿名callback才会被调用)
-        String sql1 = parser.parse(sqlBeforeParse);
+        //往mapping中添加值(parser的时候,匿名callback才会被调用)
+        parser.parse(sqlBeforeParse);
 
         List<Pair<String, Object>> paramMappingList = new ArrayList<>();
         Map<String, Object> paramMapping = new LinkedHashMap<>();
-//        //是否是单参数java基础类型
-//        boolean contains = TypeUtil.typeList.contains(parameter.getClass());
-//        MetaObject metaObject = null;
-//        if (!contains) {
-//            metaObject = MetaObject.forObject(parameter);
-//        }
         for (String name : mapping) {
             if (isSimpleType) {
                 //是否是单参数java基础类型
@@ -76,9 +69,11 @@ public class Parser {
             }
         }
 
+
+
         //处理掉为空的where条件
         SQLStatement sqlStatement = SQLUtils.parseStatements(sqlBeforeParse, JdbcConstants.MYSQL).get(0);
-
+        List<Object> paramValues = null;
         if (sqlStatement instanceof SQLSelectStatement) {
             //只处理是查询的
             SQLSelectQuery query = ((SQLSelectStatement) sqlStatement).getSelect().getQuery();
@@ -104,15 +99,35 @@ public class Parser {
                 }
 
                 GenericTokenParser parser2 = new GenericTokenParser("#{", "}", content -> "?");
-                String sql2 = parser2.parse(SQLUtils.toMySqlString(query,
-                        new SQLUtils.FormatOption(false, false)));
-                return new ParseSqlResult(sql2,
-                        paramMappingList.stream().map(Pair::getSecond).collect(Collectors.toList()));
+                sqlBeforeParse = SQLUtils.toMySqlString(query, new SQLUtils.FormatOption(false, false));
+                parser2.parse(sqlBeforeParse);
+                paramValues = paramMappingList.stream().map(Pair::getSecond).collect(Collectors.toList());
+            }
+        } else {
+            paramValues = new ArrayList<>(paramMapping.values());
+        }
+
+        //处理为数组的参数
+        GenericTokenParser parser3 = new GenericTokenParser("#{", "}", content -> {
+            Object o = paramMapping.get(content);
+            if ((o instanceof Collection)) {
+                Object[] collect = ((Collection) o).stream().map(o1 -> "?").toArray();
+                return StringUtils.join(collect,",");
+            } else {
+                return "?";
+            }
+        });
+        String sql = parser3.parse(sqlBeforeParse);
+        List paramValues2 = new ArrayList();
+        for (Object value : paramValues) {
+            if (value instanceof Collection){
+                paramValues2.addAll((Collection) value);
+            } else {
+                paramValues2.add(value);
             }
         }
 
-        return new ParseSqlResult(sql1, new ArrayList<>(paramMapping.values()));
-
+        return new ParseSqlResult(sql, paramValues2);
     }
 
 }
