@@ -135,7 +135,12 @@ public class ConverterUtil {
                     for (int i = 0; i < row.size(); i++) {
                         map.put(row.getColumnName(i), row.getValue(i));
                     }
-                    return fromValue(map, (Class) type);
+                    if (type instanceof ParameterizedType) {
+                        return fromValue(map, (Class) ((ParameterizedType) type).getActualTypeArguments()[0]);
+                    } else {
+                        return fromValue(map, (Class) type);
+
+                    }
                 }
             }
         } else {
