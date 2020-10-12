@@ -104,7 +104,11 @@ public class ConverterUtil {
                     for (int i = 0; i < row.size(); i++) {
                         map.put(row.getColumnName(i), row.getValue(i));
                     }
-                    list.add(fromValue(map, (Class) dataType));
+                    if (((ParameterizedType) dataType).getRawType() == Map.class) {
+                        list.add(fromValue(map, Map.class));
+                    } else {
+                        list.add(fromValue(map, (Class) dataType));
+                    }
                 }
             });
 
@@ -139,7 +143,6 @@ public class ConverterUtil {
                         return fromValue(map, (Class) ((ParameterizedType) type).getActualTypeArguments()[0]);
                     } else {
                         return fromValue(map, (Class) type);
-
                     }
                 }
             }
