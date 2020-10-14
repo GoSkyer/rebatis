@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-public class TypeUtil {
+public class TypeConstants {
 
     public static List<Class<?>> typeList = new ArrayList<Class<?>>() {{
         add(String.class);

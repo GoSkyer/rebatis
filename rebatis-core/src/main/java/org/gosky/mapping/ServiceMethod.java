@@ -19,7 +19,7 @@ import org.gosky.executor.Executor;
 import org.gosky.parsing.ParamNameResolver;
 import org.gosky.parsing.ParseSqlResult;
 import org.gosky.parsing.Parser;
-import org.gosky.util.TypeUtil;
+import org.gosky.util.TypeConstants;
 import org.gosky.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +27,10 @@ import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 缓存每个method 解析后的信息
@@ -166,7 +163,7 @@ public class ServiceMethod {
             ParamNameResolver paramNameResolver = new ParamNameResolver(sqlFactory.getMethod());
             Object parameter = paramNameResolver.getNamedParams(args);
             //是否是单参数java基础类型
-            boolean isSimpleType = TypeUtil.typeList.contains(parameter.getClass());
+            boolean isSimpleType = TypeConstants.typeList.contains(parameter.getClass());
             MetaObject metaObject = null;
             if (!isSimpleType) {
                 metaObject = MetaObject.forObject(parameter);

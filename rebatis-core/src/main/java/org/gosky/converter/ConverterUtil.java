@@ -5,6 +5,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.bean.copier.ValueProvider;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
 import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowIterator;
@@ -14,7 +15,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.gosky.common.ReturnTypeEnum;
 import org.gosky.common.SQLType;
 import org.gosky.mapping.SqlFactory;
-import org.gosky.util.TypeUtil;
+import org.gosky.util.TypeConstants;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -57,8 +58,6 @@ public class ConverterUtil {
 
 
     public Object convert(SqlFactory sqlFactory, RowSet<Row> rowSet, ReturnTypeEnum returnTypeEnum, Type type) {
-//        ResultSet rows = rowSet.
-        Class<?> actualClass = cn.hutool.core.util.TypeUtil.getClass(type);
         if (returnTypeEnum == ReturnTypeEnum.VOID) {
             return null;
         }
@@ -75,22 +74,12 @@ public class ConverterUtil {
         }
 
         if (returnTypeEnum == ReturnTypeEnum.LIST) {
-//            Type dataType;
-//            if (type instanceof ParameterizedType) {
-//                dataType = ((ParameterizedType) type).getActualTypeArguments()[0];
-//            } else {
-//                throw new IllegalStateException(type + " return type must be parameterized"
-//                        + " as " + type + "<Foo> or " + type + "<? extends Foo>");
-//            }
+            Class<?> actualClass = TypeUtil.getClass(TypeUtil.getTypeArgument(type));
             List<Object> list = new ArrayList<>();
             rowSet.forEach(row -> {
-                if (TypeUtil.typeList.contains(actualClass)) {
+                if (TypeConstants.typeList.contains(actualClass)) {
                     list.add(row.getValue(0));
                 } else {
-                    Map<String, Object> map = new HashMap<>();
-                    for (int i = 0; i < row.size(); i++) {
-                        map.put(row.getColumnName(i), row.getValue(i));
-                    }
                     if (actualClass == Map.class) {
                         list.add(fromValue(row, Map.class));
                     } else {
@@ -112,25 +101,18 @@ public class ConverterUtil {
             }
             return null;
         } else if (returnTypeEnum == ReturnTypeEnum.SINGLE) {
+            Class<?> actualClass = TypeUtil.getClass(type);
             RowIterator<Row> iterator = rowSet.iterator();
             if (iterator.hasNext()) {
                 Row row = iterator.next();
-                if (TypeUtil.typeList.contains(actualClass)) {
+                if (TypeConstants.typeList.contains(actualClass)) {
                     if (row.getValue(0) != null && row.getValue(0) instanceof Numeric) {
                         return NumberUtils.createNumber(((Numeric) row.getValue(0)).toString());
                     }
 
                     return row.getValue(0);
                 } else {
-//                    Map<String, Object> map = new HashMap<>();
-//                    for (int i = 0; i < row.size(); i++) {
-//                        map.put(row.getColumnName(i), row.getValue(i));
-//                    }
-                    if (type instanceof ParameterizedType) {
-                        return fromValue(row, actualClass);
-                    } else {
-                        return fromValue(row, actualClass);
-                    }
+                    return fromValue(row, actualClass);
                 }
             }
         } else {
