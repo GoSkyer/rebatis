@@ -1,18 +1,10 @@
 package org.gosky.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
-import io.vertx.core.json.DecodeException;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.json.jackson.DatabindCodec;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.bean.copier.ValueProvider;
+import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowIterator;
@@ -26,11 +18,6 @@ import org.gosky.util.TypeUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,17 +31,17 @@ import java.util.Map;
 
 public class ConverterUtil {
     private static ConverterUtil singleton;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+//    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private ConverterUtil() {
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern("HH:mm:ss")));
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        objectMapper.registerModule(javaTimeModule);
+//        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+//        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//        JavaTimeModule javaTimeModule = new JavaTimeModule();
+//        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+//        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+//        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern("HH:mm:ss")));
+//        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+//        objectMapper.registerModule(javaTimeModule);
     }
 
     public static ConverterUtil with() {
@@ -71,7 +58,7 @@ public class ConverterUtil {
 
     public Object convert(SqlFactory sqlFactory, RowSet<Row> rowSet, ReturnTypeEnum returnTypeEnum, Type type) {
 //        ResultSet rows = rowSet.
-
+        Class<?> actualClass = cn.hutool.core.util.TypeUtil.getClass(type);
         if (returnTypeEnum == ReturnTypeEnum.VOID) {
             return null;
         }
@@ -88,26 +75,26 @@ public class ConverterUtil {
         }
 
         if (returnTypeEnum == ReturnTypeEnum.LIST) {
-            Type dataType;
-            if (type instanceof ParameterizedType) {
-                dataType = ((ParameterizedType) type).getActualTypeArguments()[0];
-            } else {
-                throw new IllegalStateException(type + " return type must be parameterized"
-                        + " as " + type + "<Foo> or " + type + "<? extends Foo>");
-            }
+//            Type dataType;
+//            if (type instanceof ParameterizedType) {
+//                dataType = ((ParameterizedType) type).getActualTypeArguments()[0];
+//            } else {
+//                throw new IllegalStateException(type + " return type must be parameterized"
+//                        + " as " + type + "<Foo> or " + type + "<? extends Foo>");
+//            }
             List<Object> list = new ArrayList<>();
             rowSet.forEach(row -> {
-                if (TypeUtil.typeList.contains(dataType)) {
+                if (TypeUtil.typeList.contains(actualClass)) {
                     list.add(row.getValue(0));
                 } else {
                     Map<String, Object> map = new HashMap<>();
                     for (int i = 0; i < row.size(); i++) {
                         map.put(row.getColumnName(i), row.getValue(i));
                     }
-                    if (((ParameterizedType) dataType).getRawType() == Map.class) {
-                        list.add(fromValue(map, Map.class));
+                    if (actualClass == Map.class) {
+                        list.add(fromValue(row, Map.class));
                     } else {
-                        list.add(fromValue(map, (Class) dataType));
+                        list.add(fromValue(row, actualClass));
                     }
                 }
             });
@@ -128,21 +115,21 @@ public class ConverterUtil {
             RowIterator<Row> iterator = rowSet.iterator();
             if (iterator.hasNext()) {
                 Row row = iterator.next();
-                if (TypeUtil.typeList.contains(type)) {
+                if (TypeUtil.typeList.contains(actualClass)) {
                     if (row.getValue(0) != null && row.getValue(0) instanceof Numeric) {
                         return NumberUtils.createNumber(((Numeric) row.getValue(0)).toString());
                     }
 
                     return row.getValue(0);
                 } else {
-                    Map<String, Object> map = new HashMap<>();
-                    for (int i = 0; i < row.size(); i++) {
-                        map.put(row.getColumnName(i), row.getValue(i));
-                    }
+//                    Map<String, Object> map = new HashMap<>();
+//                    for (int i = 0; i < row.size(); i++) {
+//                        map.put(row.getColumnName(i), row.getValue(i));
+//                    }
                     if (type instanceof ParameterizedType) {
-                        return fromValue(map, (Class) ((ParameterizedType) type).getActualTypeArguments()[0]);
+                        return fromValue(row, actualClass);
                     } else {
-                        return fromValue(map, (Class) type);
+                        return fromValue(row, actualClass);
                     }
                 }
             }
@@ -153,31 +140,50 @@ public class ConverterUtil {
         return null;
     }
 
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
+//    public ObjectMapper getObjectMapper() {
+//        return objectMapper;
+//    }
 
-    public <T> T fromValue(Object json, Class<T> clazz) {
-        T value = objectMapper.convertValue(json, clazz);
-        if (clazz == Object.class) {
-            value = (T) adapt(value);
-        }
-        return value;
-    }
-
-    private static Object adapt(Object o) {
-        try {
-            if (o instanceof List) {
-                List list = (List) o;
-                return new JsonArray(list);
-            } else if (o instanceof Map) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> map = (Map<String, Object>) o;
-                return new JsonObject(map);
+    public <T> T fromValue(Row row, Class<T> clazz) {
+//        T value = objectMapper.convertValue(json, clazz);
+//        if (clazz == Object.class) {
+//            value = (T) adapt(value);
+//        }
+        T t = ReflectUtil.newInstanceIfPossible(clazz);
+        if (t instanceof Map) {
+            for (int i = 0; i < row.size(); i++) {
+                BeanUtil.setFieldValue(t, StrUtil.toCamelCase(row.getColumnName(i)), row.getValue(i));
             }
-            return o;
-        } catch (Exception e) {
-            throw new DecodeException("Failed to decode: " + e.getMessage());
+        } else {
+            t = BeanUtil.fillBean(ReflectUtil.newInstanceIfPossible(clazz), new ValueProvider<String>() {
+                @Override
+                public Object value(String s, Type type) {
+                    return row.getValue(StrUtil.toUnderlineCase(s));
+                }
+
+                @Override
+                public boolean containsKey(String s) {
+                    return true;
+                }
+            }, new CopyOptions().ignoreNullValue().ignoreCase());
         }
+        return t;
+
     }
+
+//    private static Object adapt(Object o) {
+//        try {
+//            if (o instanceof List) {
+//                List list = (List) o;
+//                return new JsonArray(list);
+//            } else if (o instanceof Map) {
+//                @SuppressWarnings("unchecked")
+//                Map<String, Object> map = (Map<String, Object>) o;
+//                return new JsonObject(map);
+//            }
+//            return o;
+//        } catch (Exception e) {
+//            throw new DecodeException("Failed to decode: " + e.getMessage());
+//        }
+//    }
 }
