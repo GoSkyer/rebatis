@@ -101,7 +101,12 @@ public class ConverterUtil {
             }
             return null;
         } else if (returnTypeEnum == ReturnTypeEnum.SINGLE) {
-            Class<?> actualClass = TypeUtil.getClass(type);
+            Class<?> actualClass;
+            if (type instanceof ParameterizedType) {
+                actualClass = TypeUtil.getClass(TypeUtil.getTypeArgument(type));
+            } else {
+                actualClass = TypeUtil.getClass(type);
+            }
             RowIterator<Row> iterator = rowSet.iterator();
             if (iterator.hasNext()) {
                 Row row = iterator.next();
