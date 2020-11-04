@@ -192,7 +192,7 @@ public class SqlHelper {
         for (EntityColumn column : columnSet) {
             if (!column.isId()) {
                 if (withNull) {
-                    sql.append(column.getColumnEqualsHolder(null));
+                    sql.append(column.getColumnEqualsHolder(null)).append(",");
                 } else {
                     sql.append(SqlHelper.getIfNotNull(column, column.getColumnEqualsHolder(null) + ",", metaObject));
                 }
