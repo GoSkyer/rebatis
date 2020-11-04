@@ -60,6 +60,15 @@ public interface BaseMapper<T> {
 
 
     /**
+     * 根据主键更新属性不为null的值
+     *
+     * @param record
+     * @return
+     */
+    @UpdateProvider(value = BaseMapperProvider.class, method = "updateByPrimaryKeyWithNull")
+    Call<Integer> updateByPrimaryKeyWithNull(T record);
+
+    /**
      * insert or update
      *
      * @param record

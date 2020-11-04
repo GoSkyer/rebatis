@@ -185,13 +185,17 @@ public class SqlHelper {
      * @param entityClass
      * @return
      */
-    public static String updateSetColumns(Class<?> entityClass, MetaObject metaObject) {
+    public static String updateSetColumns(Class<?> entityClass, MetaObject metaObject, boolean withNull) {
         StringBuilder sql = new StringBuilder();
         //获取全部列
         Set<EntityColumn> columnSet = EntityHelper.getColumns(entityClass);
         for (EntityColumn column : columnSet) {
             if (!column.isId()) {
-                sql.append(SqlHelper.getIfNotNull(column, column.getColumnEqualsHolder(null) + ",", metaObject));
+                if (withNull) {
+                    sql.append(column.getColumnEqualsHolder(null));
+                } else {
+                    sql.append(SqlHelper.getIfNotNull(column, column.getColumnEqualsHolder(null) + ",", metaObject));
+                }
             }
         }
         return " set " + StringUtils.strip(StringUtils.strip(sql.toString().trim(), "AND"), ",");

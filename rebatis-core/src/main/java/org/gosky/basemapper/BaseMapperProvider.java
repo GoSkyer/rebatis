@@ -95,9 +95,19 @@ public class BaseMapperProvider extends MapperTemplate {
         Class<?> entityClass = getEntityClass(mapper);
         StringBuilder sql = new StringBuilder();
         sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
-        sql.append(SqlHelper.updateSetColumns(entityClass, metaObject));
+        sql.append(SqlHelper.updateSetColumns(entityClass, metaObject, false));
         sql.append(SqlHelper.wherePKColumns());
         return sql.toString();
     }
+
+    public String updateByPrimaryKeyWithNull(Class<?> mapper, MetaObject metaObject) {
+        Class<?> entityClass = getEntityClass(mapper);
+        StringBuilder sql = new StringBuilder();
+        sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
+        sql.append(SqlHelper.updateSetColumns(entityClass, metaObject, true));
+        sql.append(SqlHelper.wherePKColumns());
+        return sql.toString();
+    }
+
 
 }
