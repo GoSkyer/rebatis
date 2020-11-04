@@ -6,6 +6,7 @@ import org.gosky.adapter.DefaultCallAdapterFactory;
 import org.gosky.converter.ConverterFactory;
 import org.gosky.executor.SimpleExecutor;
 import org.gosky.mapping.ServiceMethod;
+import org.gosky.util.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,12 +32,13 @@ public class Rebatis {
     public final ConverterFactory converterFactory;
     public final List<CallAdapter.Factory> callAdapterFactories;
     public static Rebatis rebatis;
+    private final Platform platform = Platform.get();
 
     public static void init(Rebatis r) {
         rebatis = r;
     }
 
-    public static Rebatis get(){
+    public static Rebatis get() {
         return rebatis;
     }
 
@@ -61,7 +63,9 @@ public class Rebatis {
                             return method.invoke(this, args);
                         }
 
-                        return loadServiceMethod(mapper, method).invoke(args);
+                        return platform.isDefaultMethod(method)
+                                ? platform.invokeDefaultMethod(method, mapper, proxy, args)
+                                : loadServiceMethod(mapper, method).invoke(args);
                     }
                 });
     }
