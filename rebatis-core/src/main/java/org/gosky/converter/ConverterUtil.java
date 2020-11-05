@@ -3,6 +3,7 @@ package org.gosky.converter;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.bean.copier.ValueProvider;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
@@ -114,8 +115,7 @@ public class ConverterUtil {
                     if (row.getValue(0) != null && row.getValue(0) instanceof Numeric) {
                         return NumberUtils.createNumber(((Numeric) row.getValue(0)).toString());
                     }
-
-                    return row.getValue(0);
+                    return Convert.convertWithCheck(actualClass, row.getValue(0), null, false);
                 } else {
                     return fromValue(row, actualClass);
                 }
