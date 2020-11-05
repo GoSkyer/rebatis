@@ -112,9 +112,6 @@ public class ConverterUtil {
             if (iterator.hasNext()) {
                 Row row = iterator.next();
                 if (TypeConstants.typeList.contains(actualClass)) {
-                    if (row.getValue(0) != null && row.getValue(0) instanceof Numeric) {
-                        return NumberUtils.createNumber(((Numeric) row.getValue(0)).toString());
-                    }
                     return Convert.convertWithCheck(actualClass, row.getValue(0), null, false);
                 } else {
                     return fromValue(row, actualClass);
