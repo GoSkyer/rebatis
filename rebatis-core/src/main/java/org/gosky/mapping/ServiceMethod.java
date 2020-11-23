@@ -184,8 +184,12 @@ public class ServiceMethod {
         long start = System.currentTimeMillis();
         Future<Object> future = executor.query(sqlResult.getSql(), sqlResult.getValues()).map(rowSet -> convert(sqlFactory, rowSet));
         future.onComplete(o -> {
+            String resultString = o.toString();
+            if (resultString.length() > 100) {
+                resultString  = resultString.substring(0,100);
+            }
             logger.info("run sql={}, params={}, duration={}, result={}", sqlResult.getSql(),
-                    sqlResult.getValues(), System.currentTimeMillis() - start, o);
+                    sqlResult.getValues(), System.currentTimeMillis() - start, resultString);
             if (o.failed()) {
                 Throwable cause = o.cause();
                 if (cause instanceof MySQLException && cause.getMessage() != null && cause.getMessage().contains("Duplicate entry")){
