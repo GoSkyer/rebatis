@@ -36,7 +36,5 @@
             <id>sonatype-repos</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </repository>
-
-
     </repositories>
 </project>
