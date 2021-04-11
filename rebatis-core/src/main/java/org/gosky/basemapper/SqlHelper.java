@@ -32,6 +32,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.gosky.util.MapperStringUtil;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 拼常用SQL的工具类
@@ -188,7 +189,11 @@ public class SqlHelper {
     public static String updateSetColumns(Class<?> entityClass, MetaObject metaObject, boolean withNull) {
         StringBuilder sql = new StringBuilder();
         //获取全部列
-        Set<EntityColumn> columnSet = EntityHelper.getColumns(entityClass);
+        Set<EntityColumn> columnSet = EntityHelper.getColumns(entityClass)
+                .stream().filter(entityColumn -> !entityColumn.getColumn().equalsIgnoreCase("mtime") &&
+                        !entityColumn.getColumn().equalsIgnoreCase("update_time"))
+                .collect(Collectors.toSet());
+
         for (EntityColumn column : columnSet) {
             if (!column.isId()) {
                 if (withNull) {
