@@ -20,10 +20,7 @@ import org.gosky.util.TypeConstants;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Auther: guozhong
@@ -142,7 +139,15 @@ public class ConverterUtil {
             t = BeanUtil.fillBean(ReflectUtil.newInstanceIfPossible(clazz), new ValueProvider<String>() {
                 @Override
                 public Object value(String s, Type type) {
-                    return row.getValue(StrUtil.toUnderlineCase(s));
+                    try {
+                        return row.getValue(StrUtil.toUnderlineCase(s));
+                    } catch (Exception e) {
+                        if (e instanceof NoSuchElementException) {
+                            return null;
+                        } else {
+                            throw e;
+                        }
+                    }
                 }
 
                 @Override
